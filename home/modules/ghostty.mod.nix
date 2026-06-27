@@ -6,6 +6,8 @@
       font-family = Berkeley Mono 2.0
       font-size = 15
 
+      macos-icon = xray
+
       background = 1e1e2e
       foreground = cdd6f4
       cursor-color = f5e0dc
