@@ -19,7 +19,12 @@
 
       casks = [
         "ghostty"
+
+        "cloudflare-warp"
+        "appcleaner"
+        "notion-calendar"
         "signal"
+
         "cursor"
         "zed"
         "visual-studio-code"
