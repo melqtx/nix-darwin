@@ -19,7 +19,7 @@
 
       casks = [
         "ghostty"
-
+        "signal"
         "cursor"
         "zed"
         "visual-studio-code"
