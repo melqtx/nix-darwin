@@ -24,6 +24,8 @@
         "appcleaner"
         "notion-calendar"
         "signal"
+        "firefox"
+        "spotify"
 
         "cursor"
         "zed"
