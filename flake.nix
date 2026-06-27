@@ -1,5 +1,11 @@
 {
-  description = "prometheus macOS config";
+  description = "prometheus darwin config";
+
+  nixConfig.experimental-features = [
+    "flakes"
+    "nix-command"
+    "pipe-operators"
+  ];
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -9,18 +15,26 @@
 
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, ... }: {
-    darwinConfigurations."prometheus" = nix-darwin.lib.darwinSystem {
-      system = "aarch64-darwin";
+  outputs =
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { lib, ... }:
+      let
+        inherit (lib.filesystem) listFilesRecursive;
+        inherit (lib.lists) filter;
+        inherit (lib.strings) hasSuffix;
+      in
+      {
+        systems = [
+          "aarch64-darwin"
+        ];
 
-      modules = [
-        ./hosts/prometheus
-        home-manager.darwinModules.home-manager
-      ];
-
-      specialArgs = { inherit inputs; };
-    };
-  };
+        imports = filter (hasSuffix ".mod.nix") (listFilesRecursive ./.);
+      }
+    );
 }
