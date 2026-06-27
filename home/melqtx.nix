@@ -148,4 +148,14 @@
 
   mouse-hide-while-typing = true
 '';
+  home.file.".config/zellij/config.kdl".text = ''
+  default_shell "fish"
+
+  default_layout "compact"
+
+  pane_frames false
+
+  copy_command "pbcopy"
+  copy_clipboard "system"
+'';
 }
