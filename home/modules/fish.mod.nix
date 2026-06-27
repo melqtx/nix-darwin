@@ -21,6 +21,7 @@
       fzf = getExe pkgs.fzf;
       helix = getExe pkgs.helix;
       jj = getExe pkgs.jujutsu;
+      neovim = getExe pkgs.neovim;
       procs = getExe pkgs.procs;
       ripgrep = getExe pkgs.ripgrep;
       sd = getExe pkgs.sd;
@@ -93,7 +94,9 @@
           sed = sd;
 
           cls = clear;
-          vim = helix;
+          vim = neovim;
+          nvim = neovim;
+          nv = neovim;
           v = helix;
           hx = helix;
           tree = "${eza} --tree";

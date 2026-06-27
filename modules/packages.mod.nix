@@ -11,6 +11,7 @@
         pkgs.starship
         pkgs.zellij
         pkgs.helix
+        pkgs.neovim
 
         pkgs.zoxide
         pkgs.atuin
