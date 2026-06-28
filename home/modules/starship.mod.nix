@@ -14,15 +14,7 @@
         enableFishIntegration = false;
 
         settings = {
-          format = /* toml */ ''
-            $directory\
-            $custom.jj\
-            $git_branch\
-            $nix_shell\
-            $python\
-            $line_break\
-            $character
-          '';
+          format = "$directory$custom.jj$git_branch$nix_shell$python$line_break$character";
 
           character = {
             success_symbol = "[（✿ ◕ ᴗ◕\\)つ━━✫・*。](dimmed)";
