@@ -6,7 +6,7 @@
       font-family = Berkeley Mono 2.0
       font-size = 15
 
-      macos-icon = xray
+      macos-icon = holographic
 
       background = 1e1e2e
       foreground = cdd6f4
