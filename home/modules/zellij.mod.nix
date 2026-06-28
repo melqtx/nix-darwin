@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  flake.homeModules.zellij = {
+  flake.homeModules.zellij = { config, ... }: {
     xdg.configFile."zellij/config.kdl".text = /* kdl */ ''
       default_shell "fish"
       default_layout "battlestation"
@@ -70,16 +70,16 @@
         tab name="battlestation" focus=true hide_floating_panes=true {
           pane split_direction="vertical" {
             pane size="30%" {
-              pane cwd="dev" size="50%"
-              pane cwd="dev" size="50%"
+              pane cwd="${config.home.homeDirectory}/code" size="50%"
+              pane cwd="${config.home.homeDirectory}/code" size="50%"
             }
-            pane command="zellij" cwd="dev" focus=true size="45%" {
+            pane command="zellij" cwd="${config.home.homeDirectory}/code" focus=true size="45%" {
               args "action" "dump-layout"
               start_suspended true
             }
             pane size="25%" {
-              pane cwd="dev" size="50%"
-              pane cwd="dev" size="50%"
+              pane cwd="${config.home.homeDirectory}/code" size="50%"
+              pane cwd="${config.home.homeDirectory}/code" size="50%"
             }
           }
         }

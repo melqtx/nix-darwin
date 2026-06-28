@@ -25,6 +25,10 @@
         "signal"
         "firefox"
         "spotify"
+        "discord"
+        "telegram"
+        "element"
+        "macs-fan-control"
 
         "cursor"
         "zed"
