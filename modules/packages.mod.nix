@@ -59,6 +59,9 @@
         pkgs.xh
 
         pkgs.go
+        pkgs.nodejs_24
+        pkgs.pnpm
+        pkgs.bun
         pkgs.uv
         pkgs.fnm
         pkgs.openjdk
