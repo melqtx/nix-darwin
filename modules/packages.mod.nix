@@ -2,8 +2,22 @@
 
 {
   flake.darwinModules.packages =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
+    let
+      inherit (lib.lists) singleton;
+
+      gradle = pkgs.gradle.override {
+        gradle-unwrapped = pkgs.gradle-unwrapped.override {
+          java = pkgs.temurin-bin-25;
+          javaToolchains = singleton pkgs.temurin-bin-25;
+        };
+      };
+    in
     {
+      environment.variables = {
+        JAVA_HOME = "${pkgs.temurin-bin-25}";
+      };
+
       environment.systemPackages = [
         pkgs.home-manager
 
@@ -64,7 +78,8 @@
         pkgs.bun
         pkgs.uv
         pkgs.fnm
-        pkgs.openjdk
+        pkgs.temurin-bin-25
+        gradle
       ];
     };
 }
