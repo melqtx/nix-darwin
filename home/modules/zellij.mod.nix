@@ -4,29 +4,30 @@
   flake.homeModules.zellij = { config, ... }: {
     xdg.configFile."zellij/config.kdl".text = /* kdl */ ''
       default_shell "fish"
-      default_layout "battlestation"
+      default_layout "clean"
 
       pane_frames false
-      simplified_ui false
+      simplified_ui true
+      session_serialization false
 
       copy_command "pbcopy"
       copy_clipboard "system"
 
-      theme "melqtx-muted"
+      theme "catppuccin-mocha"
 
       themes {
-        melqtx-muted {
-          fg 213 196 161
-          bg 40 40 40
-          black 40 40 40
-          red 234 105 98
-          green 184 187 38
-          yellow 215 153 33
-          blue 125 174 163
-          magenta 211 134 155
-          cyan 137 180 130
-          white 213 196 161
-          orange 230 126 34
+        catppuccin-mocha {
+          fg 205 214 244
+          bg 30 30 46
+          black 49 50 68
+          red 243 139 168
+          green 166 227 161
+          yellow 249 226 175
+          blue 137 180 250
+          magenta 203 166 247
+          cyan 148 226 213
+          white 186 194 222
+          orange 250 179 135
         }
       }
 
@@ -61,6 +62,15 @@
           bind "Ctrl p" { NewPane; ToggleFloatingPanes; }
           bind "Ctrl q" { Quit; }
           bind "Ctrl d" { Detach; }
+        }
+      }
+    '';
+
+    xdg.configFile."zellij/layouts/clean.kdl".text = /* kdl */ ''
+      layout {
+        pane
+        pane size=1 borderless=true {
+          plugin location="tab-bar"
         }
       }
     '';

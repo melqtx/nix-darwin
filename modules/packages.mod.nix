@@ -64,6 +64,7 @@
         pkgs.tldr
         pkgs.llm
         pkgs.tokei
+        pkgs.fastfetch
         pkgs.hyperfine
         pkgs.watchexec
         pkgs.sd

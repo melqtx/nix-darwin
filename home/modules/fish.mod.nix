@@ -2,7 +2,7 @@
 
 {
   flake.homeModules.fish =
-    { lib, pkgs, ... }:
+    { config, lib, pkgs, ... }:
     let
       inherit (lib.meta) getExe getExe';
 
@@ -57,6 +57,17 @@
           ${fzf} --fish | source
           ${fnm} env --use-on-cd | source
         '';
+
+        functions = {
+          battle = /* fish */ ''
+            builtin cd ${config.home.homeDirectory}/code
+            ${zellij} --layout battlestation
+          '';
+
+          battlestation = /* fish */ ''
+            battle
+          '';
+        };
 
         shellAliases = {
           cd = "z";
