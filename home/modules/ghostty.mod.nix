@@ -13,7 +13,7 @@
         font-family = Berkeley Mono 2.0
         font-size = 15
 
-        command = direct:${zellij} attach --create --force-run-commands main
+        command = direct:${zellij} --layout clean
 
         background = 1e1e2e
         foreground = cdd6f4
@@ -41,7 +41,7 @@
         copy-on-select = clipboard
         macos-option-as-alt = true
 
-        window-save-state = always
+        window-save-state = never
         window-inherit-working-directory = true
 
         mouse-hide-while-typing = true

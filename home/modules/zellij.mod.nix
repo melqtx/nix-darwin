@@ -50,13 +50,13 @@
 
           bind "Super h" { GoToPreviousTab; }
           bind "Super l" { GoToNextTab; }
-          bind "Super t" { NewTab; }
+          bind "Super t" { NewTab; SwitchToMode "RenameTab"; TabNameInput 0; }
           bind "Super w" { CloseTab; }
           bind "Super r" { SwitchToMode "RenameTab"; TabNameInput 0; }
 
           bind "Super Shift h" { GoToPreviousTab; }
           bind "Super Shift l" { GoToNextTab; }
-          bind "Super Shift t" { NewTab; }
+          bind "Super Shift t" { NewTab; SwitchToMode "RenameTab"; TabNameInput 0; }
           bind "Super Shift w" { CloseTab; }
 
           bind "Ctrl Shift h" { MovePane "Left"; }
@@ -93,9 +93,24 @@
 
       xdg.configFile."zellij/layouts/clean.kdl".text = /* kdl */ ''
       layout {
-        pane
-        pane size=1 borderless=true {
-          plugin location="tab-bar"
+        default_tab_template {
+          children
+          pane size=1 borderless=true {
+            plugin location="tab-bar"
+          }
+        }
+
+        tab name="main" focus=true {
+          pane
+        }
+        tab name="dots" {
+          pane cwd="${config.home.homeDirectory}/dots"
+        }
+        tab name="work" {
+          pane cwd="${config.home.homeDirectory}/code"
+        }
+        tab name="scratch" {
+          pane
         }
       }
     '';
