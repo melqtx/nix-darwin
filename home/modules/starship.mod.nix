@@ -1,53 +1,85 @@
 { ... }:
 
 {
-  flake.homeModules.starship = {
-    programs.starship = {
-      enable = true;
-      enableFishIntegration = false;
+  flake.homeModules.starship =
+    { lib, pkgs, ... }:
+    let
+      inherit (lib.meta) getExe;
 
-      settings = {
-        format = "$directory$git_branch$git_status$nix_shell$python$line_break$character";
+      jj = getExe pkgs.jujutsu;
+    in
+    {
+      programs.starship = {
+        enable = true;
+        enableFishIntegration = false;
 
-        character = {
-          success_symbol = "[（✿ ◕ ᴗ◕\\)つ━━✫・*。](dimmed)";
-          error_symbol = "[ Ψ\\(`_´ # \\)↝ ](red)";
-          vimcmd_symbol = "[󰄛 ❮](dimmed)";
-        };
+        settings = {
+          format = /* toml */ ''
+            $directory\
+            $custom.jj\
+            $git_branch\
+            $nix_shell\
+            $python\
+            $line_break\
+            $character
+          '';
 
-        directory = {
-          format = "[$path]($style)";
-          style = "bold green";
-        };
+          character = {
+            success_symbol = "[（✿ ◕ ᴗ◕\\)つ━━✫・*。](dimmed)";
+            error_symbol = "[ Ψ\\(`_´ # \\)↝ ](red)";
+            vimcmd_symbol = "[󰄛 ❮](subtext1)";
+          };
 
-        git_branch = {
-          format = "  [ $branch]($style)";
-          style = "yellow";
-        };
+          directory = {
+            format = "";
+            style = "bold green";
+          };
 
-        git_status = {
-          format = "[ $conflicted$untracked$modified$staged$renamed$deleted]($style)";
-          style = "cyan";
-          conflicted = " ";
-          untracked = "󰰨 ";
-          modified = "󰯲 ";
-          staged = "󰰢 ";
-          renamed = "󰰟 ";
-          deleted = "󰯵 ";
-          stashed = "≡";
-        };
+          git_branch = {
+            format = "  [ $branch]($style)";
+            style = "yellow";
+          };
 
-        python = {
-          format = "[$virtualenv]($style) ";
-          style = "bright-black";
-        };
+          git_status = {
+            format = "[[( [::](dimmed) $conflicted$untracked$modified$staged$renamed$deleted)](blue) ($ahead_behind$stashed)]($style)";
+            style = "cyan";
+            conflicted = " ";
+            untracked = "󰰨 ";
+            modified = "󰯲 ";
+            staged = "󰰢 ";
+            renamed = "󰰟 ";
+            deleted = "󰯵 ";
+            stashed = "≡";
+          };
 
-        nix_shell = {
-          format = " [$symbol$state( \\($name\\))]($style) ";
-          symbol = " ";
-          style = "dimmed purple";
+          git_state = {
+            format = "\\(\\) ";
+            style = "bright-black";
+          };
+
+          cmd_duration = {
+            format = "[(   󱎫  took $duration\\n)]($style)";
+            style = "dimmed";
+          };
+
+          python = {
+            format = " ";
+            style = "bright-black";
+          };
+
+          nix_shell = {
+            format = "  ";
+            symbol = " ";
+            style = "dimmed purple";
+          };
+
+          custom.jj = {
+            command = "${jj} --ignore-working-copy log --no-graph --revisions @ --template '\" 󰊢 \" ++ change_id.short()'";
+            when = "${jj} --ignore-working-copy root";
+            format = "[$output]($style)";
+            style = "dimmed purple";
+          };
         };
       };
     };
-  };
 }

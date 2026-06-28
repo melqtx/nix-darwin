@@ -19,7 +19,6 @@
 
       casks = [
         "ghostty"
-
         "cloudflare-warp"
         "appcleaner"
         "notion-calendar"
