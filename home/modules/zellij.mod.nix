@@ -1,14 +1,24 @@
 { ... }:
 
 {
-  flake.homeModules.zellij = { config, ... }: {
-    xdg.configFile."zellij/config.kdl".text = /* kdl */ ''
-      default_shell "fish"
+  flake.homeModules.zellij =
+    { config, lib, pkgs, ... }:
+    let
+      inherit (lib.meta) getExe;
+
+      fish = getExe pkgs.fish;
+    in
+    {
+      xdg.configFile."zellij/config.kdl".text = /* kdl */ ''
+      default_shell "${fish}"
       default_layout "clean"
 
       pane_frames false
       simplified_ui true
+      mouse_mode false
       session_serialization false
+      show_release_notes false
+      stacked_resize true
 
       copy_command "pbcopy"
       copy_clipboard "system"
@@ -42,31 +52,46 @@
           bind "Super l" { GoToNextTab; }
           bind "Super t" { NewTab; }
           bind "Super w" { CloseTab; }
+          bind "Super r" { SwitchToMode "RenameTab"; TabNameInput 0; }
+
+          bind "Super Shift h" { GoToPreviousTab; }
+          bind "Super Shift l" { GoToNextTab; }
+          bind "Super Shift t" { NewTab; }
+          bind "Super Shift w" { CloseTab; }
 
           bind "Ctrl Shift h" { MovePane "Left"; }
           bind "Ctrl Shift j" { MovePane "Down"; }
           bind "Ctrl Shift k" { MovePane "Up"; }
           bind "Ctrl Shift l" { MovePane "Right"; }
+          bind "Ctrl Shift w" { CloseFocus; }
 
           bind "Alt h" { NewPane "Left"; }
           bind "Alt j" { NewPane "Down"; }
           bind "Alt k" { NewPane "Up"; }
           bind "Alt l" { NewPane "Right"; }
+          bind "Alt v" { NewPane "Right"; }
+          bind "Alt s" { NewPane "Down"; }
+          bind "Alt Shift s" { NewPane "stacked"; }
 
-          bind "Alt Shift h" { Resize "Increase Left"; }
-          bind "Alt Shift j" { Resize "Increase Down"; }
-          bind "Alt Shift k" { Resize "Increase Up"; }
-          bind "Alt Shift l" { Resize "Increase Right"; }
+          bind "Ctrl Alt h" { Resize "Increase Left"; }
+          bind "Ctrl Alt j" { Resize "Increase Down"; }
+          bind "Ctrl Alt k" { Resize "Increase Up"; }
+          bind "Ctrl Alt l" { Resize "Increase Right"; }
+          bind "Ctrl Alt Shift h" { Resize "Decrease Left"; }
+          bind "Ctrl Alt Shift j" { Resize "Decrease Down"; }
+          bind "Ctrl Alt Shift k" { Resize "Decrease Up"; }
+          bind "Ctrl Alt Shift l" { Resize "Decrease Right"; }
 
           bind "Ctrl f" { ToggleFocusFullscreen; }
-          bind "Ctrl p" { NewPane; ToggleFloatingPanes; }
+          bind "Ctrl p" { NewPane; TogglePaneEmbedOrFloating; }
+          bind "Ctrl Shift p" { ToggleFloatingPanes; }
           bind "Ctrl q" { Quit; }
           bind "Ctrl d" { Detach; }
         }
       }
     '';
 
-    xdg.configFile."zellij/layouts/clean.kdl".text = /* kdl */ ''
+      xdg.configFile."zellij/layouts/clean.kdl".text = /* kdl */ ''
       layout {
         pane
         pane size=1 borderless=true {
@@ -75,7 +100,7 @@
       }
     '';
 
-    xdg.configFile."zellij/layouts/battlestation.kdl".text = /* kdl */ ''
+      xdg.configFile."zellij/layouts/battlestation.kdl".text = /* kdl */ ''
       layout {
         tab name="battlestation" focus=true hide_floating_panes=true {
           pane split_direction="vertical" {
@@ -92,8 +117,11 @@
               pane cwd="${config.home.homeDirectory}/code" size="50%"
             }
           }
+          pane size=1 borderless=true {
+            plugin location="tab-bar"
+          }
         }
       }
     '';
-  };
+    };
 }

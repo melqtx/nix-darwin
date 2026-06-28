@@ -1,11 +1,19 @@
 { ... }:
 
 {
-  flake.homeModules.ghostty = {
-    xdg.configFile."ghostty/config".text = /* conf */ ''
+  flake.homeModules.ghostty =
+    { lib, pkgs, ... }:
+    let
+      inherit (lib.meta) getExe;
+
+      zellij = getExe pkgs.zellij;
+    in
+    {
+      xdg.configFile."ghostty/config".text = /* conf */ ''
         font-family = Berkeley Mono 2.0
         font-size = 15
 
+        command = direct:${zellij} attach --create --force-run-commands main
 
         background = 1e1e2e
         foreground = cdd6f4
@@ -13,7 +21,7 @@
         selection-background = 585b70
         selection-foreground = cdd6f4
 
-        shell-integration = fish
+        shell-integration = detect
 
         window-decoration = false
         macos-titlebar-style = hidden
@@ -42,6 +50,8 @@
         keybind = super+w=unbind
         keybind = super+h=unbind
         keybind = super+l=unbind
+        keybind = super+shift+t=unbind
+        keybind = super+shift+w=unbind
         keybind = super+shift+h=unbind
         keybind = super+shift+l=unbind
         keybind = ctrl+h=unbind
@@ -49,5 +59,5 @@
         keybind = ctrl+k=unbind
         keybind = ctrl+l=unbind
       '';
-  };
+    };
 }

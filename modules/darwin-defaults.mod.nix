@@ -21,6 +21,11 @@
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
       };
+
+      CustomUserPreferences."com.mitchellh.ghostty".NSUserKeyEquivalents = {
+        "Hide Ghostty" = "@~^$h";
+        "Hide Others" = "@~^$o";
+      };
     };
   };
 }
