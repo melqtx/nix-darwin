@@ -6,7 +6,7 @@
       font-family = Berkeley Mono 2.0
       font-size = 15
 
-      macos-icon = holographic
+      macos-icon = chalkboard
 
       background = 1e1e2e
       foreground = cdd6f4

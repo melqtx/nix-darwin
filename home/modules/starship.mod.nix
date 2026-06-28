@@ -14,7 +14,7 @@
         enableFishIntegration = false;
 
         settings = {
-          format = "$directory$custom.jj$git_branch$nix_shell$python$line_break$character";
+          format = "$directory$git_branch$custom.jj$nix_shell$python$line_break$character";
 
           character = {
             success_symbol = "[（✿ ◕ ᴗ◕\\)つ━━✫・*。](dimmed)";
@@ -66,9 +66,9 @@
           };
 
           custom.jj = {
-            command = "${jj} --ignore-working-copy log --no-graph --revisions @ --template '\" 󰊢 \" ++ change_id.short()'";
-            when = "${jj} --ignore-working-copy root";
-            format = "[$output]($style)";
+            command = "${jj} --ignore-working-copy log --no-graph --revisions @ --template 'change_id.short()'";
+            when = "${jj} --ignore-working-copy root --quiet";
+            format = "  [jj $output]($style)";
             style = "dimmed purple";
           };
         };
