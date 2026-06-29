@@ -6,6 +6,7 @@
 
     modules = [
       inputs.home-manager.darwinModules.home-manager
+      inputs.nix-homebrew.darwinModules.nix-homebrew
 
       config.flake.darwinModules.darwin-defaults
       config.flake.darwinModules.homebrew

@@ -4,7 +4,8 @@
   flake.darwinModules.packages =
     { lib, pkgs, ... }:
     let
-      inherit (lib.lists) singleton;
+      inherit (lib.lists) elem singleton;
+      inherit (lib.strings) getName;
 
       gradle = pkgs.gradle.override {
         gradle-unwrapped = pkgs.gradle-unwrapped.override {
@@ -14,18 +15,27 @@
       };
     in
     {
+      nixpkgs.config.allowUnfreePredicate = pkg: elem (getName pkg) (singleton "claude-code");
+
       environment.variables = {
         JAVA_HOME = "${pkgs.temurin-bin-25}";
       };
 
       environment.systemPackages = [
         pkgs.home-manager
+        pkgs.nh
+        pkgs.nvd
+        pkgs.nix-output-monitor
+        pkgs.statix
+        pkgs.deadnix
+        pkgs.comma
 
         pkgs.fish
         pkgs.starship
         pkgs.zellij
         pkgs.helix
         pkgs.neovim
+        pkgs.emacs30
 
         pkgs.zoxide
         pkgs.atuin
@@ -35,6 +45,7 @@
         pkgs.jujutsu
         pkgs.gh
         pkgs.delta
+        pkgs.git
 
         pkgs.ripgrep
         pkgs.fd
@@ -46,9 +57,12 @@
         pkgs.eza
         pkgs.bat
         pkgs.yazi
+        pkgs.wget
         pkgs.dua
         pkgs.dust
         pkgs.procs
+        pkgs.ncdu
+        pkgs.unzip
 
         pkgs.jq
         pkgs.yq
@@ -63,6 +77,10 @@
 
         pkgs.tldr
         pkgs.llm
+        pkgs.codex
+        pkgs.claude-code
+        pkgs.television
+        pkgs.pfetch-rs
         pkgs.tokei
         pkgs.fastfetch
         pkgs.hyperfine
@@ -72,6 +90,14 @@
         pkgs.difftastic
         pkgs.hexyl
         pkgs.xh
+        pkgs.peaclock
+        pkgs.pandoc
+        pkgs.yt-dlp
+        pkgs.ytfzf
+        pkgs.gum
+        pkgs.shellcheck
+        pkgs.ispell
+        pkgs.hunspell
 
         pkgs.go
         pkgs.nodejs_24
@@ -79,6 +105,13 @@
         pkgs.bun
         pkgs.uv
         pkgs.fnm
+        pkgs.cmake
+        pkgs.gnumake
+        pkgs.gcc
+        pkgs.libtool
+        pkgs.sqlite
+        pkgs.gnutls
+        pkgs.zstd
         pkgs.temurin-bin-25
         gradle
       ];

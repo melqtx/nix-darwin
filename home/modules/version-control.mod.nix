@@ -35,6 +35,8 @@
     {
       home.packages = [
         pkgs.jujutsu
+        pkgs.jjui
+        pkgs.lazyjj
         pkgs.delta
         pkgs.gh
       ];

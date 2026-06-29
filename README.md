@@ -12,8 +12,10 @@ Tiny Nix-powered macOS den. Terminal-first, jj-friendly, and only mildly haunted
 ├── home
 │   ├── melqtx.mod.nix
 │   └── modules
+│       ├── emacs.mod.nix
 │       ├── fish.mod.nix
 │       ├── ghostty.mod.nix
+│       ├── hammerspoon.mod.nix
 │       ├── helix.mod.nix
 │       ├── language-tools.mod.nix
 │       ├── starship.mod.nix

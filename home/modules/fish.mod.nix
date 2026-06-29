@@ -10,10 +10,12 @@
       bat = getExe pkgs.bat;
       bottom = getExe pkgs.bottom;
       btop = getExe pkgs.btop;
+      carapace = getExe pkgs.carapace;
       clear = getExe' pkgs.ncurses "clear";
       delta = getExe pkgs.delta;
       direnv = getExe pkgs.direnv;
       dust = getExe pkgs.dust;
+      emacsclient = getExe' pkgs.emacs30 "emacsclient";
       eza = getExe pkgs.eza;
       fd = getExe pkgs.fd;
       fish = getExe pkgs.fish;
@@ -22,6 +24,7 @@
       helix = getExe pkgs.helix;
       jj = getExe pkgs.jujutsu;
       neovim = getExe pkgs.neovim;
+      nh = getExe pkgs.nh;
       procs = getExe pkgs.procs;
       ripgrep = getExe pkgs.ripgrep;
       sd = getExe pkgs.sd;
@@ -35,6 +38,7 @@
       home.sessionVariables = {
         EDITOR = helix;
         VISUAL = helix;
+        NH_FLAKE = "${config.home.homeDirectory}/dots";
       };
 
       programs.fish = {
@@ -45,6 +49,7 @@
           fish_add_path /opt/homebrew/bin
           fish_add_path /opt/homebrew/sbin
           fish_add_path ~/.local/bin
+          fish_add_path ~/.config/emacs/bin
 
           set --global --export GPG_TTY (tty)
         '';
@@ -56,6 +61,7 @@
           ${direnv} hook fish | source
           ${fzf} --fish | source
           ${fnm} env --use-on-cd | source
+          ${carapace} _carapace fish | source
         '';
 
         functions = {
@@ -85,6 +91,7 @@
           ju = "${jj} undo";
 
           lg = "${jj} log";
+          log = "${config.home.homeDirectory}/Documents/code/github/1337/bin/log";
 
           ls = "${eza} --icons --group-directories-first";
           l = "${eza} --all --icons --group-directories-first --sort=date";
@@ -110,8 +117,12 @@
           nv = neovim;
           v = helix;
           hx = helix;
+
+          emacs = "${emacsclient} --tty --alternate-editor=''";
+          e = "${emacsclient} --tty --alternate-editor=''";
+          eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
           tree = "${eza} --tree";
-          rebuild = "/usr/bin/sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/dots#prometheus";
+          rebuild = "${nh} darwin switch";
           dots = "cd ~/dots";
           zj = zellij;
           fish = fish;

@@ -18,6 +18,8 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
   outputs =
@@ -26,13 +28,11 @@
       { lib, ... }:
       let
         inherit (lib.filesystem) listFilesRecursive;
-        inherit (lib.lists) filter;
+        inherit (lib.lists) filter singleton;
         inherit (lib.strings) hasSuffix;
       in
       {
-        systems = [
-          "aarch64-darwin"
-        ];
+        systems = singleton "aarch64-darwin";
 
         imports = filter (hasSuffix ".mod.nix") (listFilesRecursive ./.);
       }

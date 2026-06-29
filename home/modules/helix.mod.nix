@@ -5,6 +5,7 @@
     { lib, pkgs, ... }:
     let
       inherit (lib.meta) getExe;
+      inherit (lib.lists) singleton;
 
       githubPermalink = pkgs.callPackage (
         {
@@ -25,7 +26,7 @@
             line="''${2:-1}"
 
             root="$(jj root 2>/dev/null)"
-            remote="$(jj git remote list 2>/dev/null | sed -n 's/^origin[[:space:]]*//p' | sed -n '1p')"
+            remote="$(jj git remote list 2>/dev/null | sed --quiet 's/^origin[[:space:]]*//p' | sed --quiet '1p')"
             change="$(jj log --no-graph --revisions @ --template 'commit_id.short()' 2>/dev/null)"
 
             relative="''${file#"$root"/}"
@@ -40,12 +41,10 @@
       ) { };
     in
     {
-      home.packages = [
-        pkgs.helix
-      ];
+      home.packages = singleton pkgs.helix;
 
       xdg.configFile."helix/config.toml".text = /* toml */ ''
-        theme = "gruvbox"
+        theme = "catppuccin_mocha"
 
         [editor]
         auto-completion = true
