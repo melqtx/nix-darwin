@@ -37,6 +37,7 @@
         pkgs.jujutsu
         pkgs.jjui
         pkgs.lazyjj
+        pkgs.lazygit
         pkgs.delta
         pkgs.gh
       ];

@@ -40,9 +40,12 @@
         "macs-fan-control"
         "hammerspoon"
         "zen"
+        "thebrowsercompany-dia"
         "cursor"
         "zed"
         "visual-studio-code"
+        "obsidian"
+        "raycast"
 
         "orbstack"
 

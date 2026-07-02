@@ -118,8 +118,9 @@
           v = helix;
           hx = helix;
 
-          emacs = "${emacsclient} --tty --alternate-editor=''";
-          e = "${emacsclient} --tty --alternate-editor=''";
+          # ghostty's xterm-ghostty terminfo is unknown to the emacs daemon
+          emacs = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
+          e = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
           tree = "${eza} --tree";
           rebuild = "${nh} darwin switch";
