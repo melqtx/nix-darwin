@@ -137,6 +137,22 @@
 
         inputStatsTap:start()
         hs.shutdownCallback = flush
+
+        -- cmd+alt+ctrl+S publishes current stats to melqtx.com
+        local publishStatsScript = "/Users/melqtx/Documents/code/github/1337/bin/update-input-stats"
+        hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "S", function()
+          flush()
+          hs.notify.new({ title = "input stats", informativeText = "publishing..." }):send()
+          hs.task.new("/bin/zsh", function(exitCode, stdOut, stdErr)
+            local text
+            if exitCode == 0 then
+              text = stdOut:gsub("%s+$", "")
+            else
+              text = "failed: " .. stdErr:gsub("%s+$", "")
+            end
+            hs.notify.new({ title = "input stats", informativeText = text }):send()
+          end, { "-lc", publishStatsScript }):start()
+        end)
       '';
     };
 }

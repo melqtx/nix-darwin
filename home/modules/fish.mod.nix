@@ -49,6 +49,7 @@
           fish_add_path /opt/homebrew/bin
           fish_add_path /opt/homebrew/sbin
           fish_add_path ~/.local/bin
+          fish_add_path ~/go/bin
           fish_add_path ~/.config/emacs/bin
 
           set --global --export GPG_TTY (tty)

@@ -23,6 +23,7 @@
         "ffmpeg"
         "imagemagick"
         "vnstat"
+        "cloudflare-wrangler"
       ];
 
       casks = [
@@ -46,7 +47,7 @@
         "visual-studio-code"
         "obsidian"
         "raycast"
-
+        "t3-code"
         "orbstack"
 
         "font-jetbrains-mono-nerd-font"
