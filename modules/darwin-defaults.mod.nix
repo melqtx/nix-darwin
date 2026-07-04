@@ -20,7 +20,6 @@
         ApplePressAndHoldEnabled = false;
         InitialKeyRepeat = 15;
         KeyRepeat = 2;
-        NSWindowResizeTime = 0.001;
       };
 
       CustomUserPreferences."com.mitchellh.ghostty".NSUserKeyEquivalents = {
