@@ -19,127 +19,139 @@
     home.stateVersion = "26.05";
 
     home.file."Library/Logs/Syncthing/.keep".text = "";
-    home.file.".amethyst.yml".text = /* yaml */ ''
-      # Layouts to enable (in order of cycling)
-      layouts:
-        - tall
-        - wide
-        - fullscreen
-        - column
+    home.file.".amethyst".text = builtins.toJSON {
+      layouts = [
+        "tall"
+        "wide"
+        "fullscreen"
+        "column"
+      ];
 
-      # Modifier keys (option = alt on Mac)
-      mod1:
-        - option
-      mod2:
-        - option
-        - shift
+      mod1 = [ "option" ];
+      mod2 = [
+        "option"
+        "shift"
+      ];
 
-      # Window focus and movement commands (i3-like)
-      commands:
-        # Screen focus
-        focus-screen-1:
-          mod: mod1
-          key: '1'
-        focus-screen-2:
-          mod: mod1
-          key: '2'
-        focus-screen-3:
-          mod: mod1
-          key: '3'
+      focus-screen-1 = {
+        mod = "mod1";
+        key = "1";
+      };
+      focus-screen-2 = {
+        mod = "mod1";
+        key = "2";
+      };
+      focus-screen-3 = {
+        mod = "mod1";
+        key = "3";
+      };
 
-        # Window focus (vim-style like i3)
-        focus-left:
-          mod: mod1
-          key: h
-        focus-right:
-          mod: mod1
-          key: l
-        focus-up:
-          mod: mod1
-          key: k
-        focus-down:
-          mod: mod1
-          key: j
+      focus-ccw = {
+        mod = "mod1";
+        key = "j";
+      };
+      focus-cw = {
+        mod = "mod1";
+        key = "k";
+      };
+      focus-main = {
+        mod = "mod1";
+        key = "m";
+      };
 
-        # Window movement (with shift, like i3)
-        swap-left:
-          mod: mod2
-          key: h
-        swap-right:
-          mod: mod2
-          key: l
-        swap-up:
-          mod: mod2
-          key: k
-        swap-down:
-          mod: mod2
-          key: j
+      swap-ccw = {
+        mod = "mod2";
+        key = "j";
+      };
+      swap-cw = {
+        mod = "mod2";
+        key = "k";
+      };
+      swap-main = {
+        mod = "mod2";
+        key = "m";
+      };
 
-        # Layout management
-        cycle-layout:
-          mod: mod1
-          key: space
-        toggle-float:
-          mod: mod1
-          key: t
-        toggle-fullscreen:
-          mod: mod1
-          key: f
+      shrink-main = {
+        mod = "mod1";
+        key = "h";
+      };
+      expand-main = {
+        mod = "mod1";
+        key = "l";
+      };
+      increase-main = {
+        mod = "mod1";
+        key = ",";
+      };
+      decrease-main = {
+        mod = "mod1";
+        key = ".";
+      };
 
-        # Window resizing
-        increase-main:
-          mod: mod1
-          key: period
-        decrease-main:
-          mod: mod1
-          key: comma
+      cycle-layout = {
+        mod = "mod1";
+        key = "space";
+      };
+      select-tall-layout = {
+        mod = "mod1";
+        key = "a";
+      };
+      select-wide-layout = {
+        mod = "mod1";
+        key = "s";
+      };
+      select-column-layout = {
+        mod = "mod1";
+        key = "d";
+      };
+      select-fullscreen-layout = {
+        mod = "mod1";
+        key = "f";
+      };
+      toggle-float = {
+        mod = "mod1";
+        key = "t";
+      };
 
-        # Workspace management
-        select-tall-layout:
-          mod: mod1
-          key: a
-        select-wide-layout:
-          mod: mod1
-          key: s
-        select-column-layout:
-          mod: mod1
-          key: d
+      throw-space-1 = {
+        mod = "mod2";
+        key = "1";
+      };
+      throw-space-2 = {
+        mod = "mod2";
+        key = "2";
+      };
+      throw-space-3 = {
+        mod = "mod2";
+        key = "3";
+      };
 
-        # Move windows to spaces (workspaces)
-        throw-space-1:
-          mod: mod2
-          key: '1'
-        throw-space-2:
-          mod: mod2
-          key: '2'
-        throw-space-3:
-          mod: mod2
-          key: '3'
+      relaunch-amethyst = {
+        mod = "mod2";
+        key = "r";
+      };
+      reevaluate-windows = {
+        mod = "mod1";
+        key = "z";
+      };
 
-        # Reload config
-        relaunch-amethyst:
-          mod: mod2
-          key: r
+      window-margins = true;
+      window-margin-size = 5;
+      smart-window-margins = true;
+      mouse-follows-focus = true;
+      focus-follows-mouse = false;
 
-      # Window margins and padding
-      window-margins: true
-      window-margin-size: 5
-      smart-window-margins: true
+      floating = [
+        "com.apple.systempreferences"
+        "com.apple.Calculator"
+        "com.apple.Preview"
+      ];
 
-      # Mouse behavior
-      mouse-follows-focus: true
-      focus-follows-mouse: false
-
-      # Floating windows (apps that shouldn't be tiled)
-      floating:
-        - com.apple.systempreferences
-        - com.apple.Calculator
-        - com.apple.Preview
-
-      # HUD settings
-      enables-layout-hud: true
-      enables-layout-hud-on-space-change: true
-    '';
+      enables-layout-hud = true;
+      enables-layout-hud-on-space-change = true;
+      enables-window-count-hud = false;
+    };
 
     programs.home-manager.enable = true;
     services.syncthing.enable = true;
