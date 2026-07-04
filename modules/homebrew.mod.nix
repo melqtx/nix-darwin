@@ -40,6 +40,7 @@
         "element"
         "macs-fan-control"
         "hammerspoon"
+        "amethyst"
         "zen"
         "thebrowsercompany-dia"
         "cursor"
