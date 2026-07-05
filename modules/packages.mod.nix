@@ -58,6 +58,7 @@
         pkgs.bat
         pkgs.yazi
         pkgs.wget
+        pkgs.aria2
         pkgs.dua
         pkgs.dust
         pkgs.procs
