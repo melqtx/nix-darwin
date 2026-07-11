@@ -2,8 +2,6 @@
 
 {
   flake.darwinModules.homebrew = {
-    # Pin and manage the Homebrew installation itself declaratively. autoMigrate
-    # adopts the existing /opt/homebrew (owned by melqtx) instead of reinstalling.
     nix-homebrew = {
       enable = true;
       user = "melqtx";
@@ -45,6 +43,7 @@
         "cursor"
         "zed"
         "visual-studio-code"
+        "vlc"
         "obsidian"
         "raycast"
         "t3-code"
