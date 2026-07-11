@@ -108,7 +108,6 @@
         pkgs.fnm
         pkgs.cmake
         pkgs.gnumake
-        pkgs.gcc
         pkgs.libtool
         pkgs.sqlite
         pkgs.gnutls
