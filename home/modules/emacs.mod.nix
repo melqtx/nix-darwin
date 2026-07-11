@@ -2,7 +2,12 @@
 
 {
   flake.homeModules.emacs =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (lib.meta) getExe;
 
