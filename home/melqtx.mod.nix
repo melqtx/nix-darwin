@@ -12,6 +12,7 @@
       config.flake.homeModules.language-tools
       config.flake.homeModules.emacs
       config.flake.homeModules.hammerspoon
+      config.flake.homeModules.helium
     ];
 
     home.username = "melqtx";
