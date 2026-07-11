@@ -94,12 +94,12 @@
           lg = "${jj} log";
           log = "${config.home.homeDirectory}/Documents/code/github/1337/bin/log";
 
-          ls = "${eza} --icons --group-directories-first";
-          l = "${eza} --all --icons --group-directories-first --sort=date";
-          ll = "${eza} --all --long --icons --group-directories-first --sort=name";
-          la = "${eza} --all --long --git --icons --group-directories-first --sort=date";
-          lt = "${eza} --all --tree --icons --group-directories-first";
-          lr = "${eza} --recurse --icons --group-directories-first";
+          ls = "${eza} --no-quotes --icons --group-directories-first";
+          l = "${eza} --no-quotes --all --icons --group-directories-first --sort=date";
+          ll = "${eza} --no-quotes --all --long --icons --group-directories-first --sort=name";
+          la = "${eza} --no-quotes --all --long --git --icons --group-directories-first --sort=date";
+          lt = "${eza} --no-quotes --all --tree --icons --group-directories-first";
+          lr = "${eza} --no-quotes --recurse --icons --group-directories-first";
 
           cat = bat;
           grep = ripgrep;
@@ -123,7 +123,7 @@
           emacs = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           e = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
-          tree = "${eza} --tree";
+          tree = "${eza} --no-quotes --tree";
           rebuild = "${nh} darwin switch";
           dots = "cd ~/dots";
           zj = zellij;
