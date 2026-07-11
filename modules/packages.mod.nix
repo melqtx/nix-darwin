@@ -33,7 +33,6 @@
         pkgs.fish
         pkgs.starship
         pkgs.zellij
-        pkgs.helix
         pkgs.neovim
         pkgs.emacs30
 
@@ -42,9 +41,6 @@
         pkgs.direnv
         pkgs.nix-direnv
         pkgs.fzf
-        pkgs.jujutsu
-        pkgs.gh
-        pkgs.delta
         pkgs.git
 
         pkgs.ripgrep
@@ -83,6 +79,7 @@
         pkgs.television
         pkgs.pfetch-rs
         pkgs.tokei
+        pkgs.cloc
         pkgs.fastfetch
         pkgs.hyperfine
         pkgs.watchexec
