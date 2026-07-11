@@ -23,21 +23,21 @@
       copy_command "pbcopy"
       copy_clipboard "system"
 
-      theme "catppuccin-mocha"
+      theme "gruvbox-dark"
 
       themes {
-        catppuccin-mocha {
-          fg 205 214 244
-          bg 30 30 46
-          black 49 50 68
-          red 243 139 168
-          green 166 227 161
-          yellow 249 226 175
-          blue 137 180 250
-          magenta 203 166 247
-          cyan 148 226 213
-          white 186 194 222
-          orange 250 179 135
+        gruvbox-dark {
+          fg 235 219 178
+          bg 40 40 40
+          black 40 40 40
+          red 204 36 29
+          green 152 151 26
+          yellow 215 153 33
+          blue 69 133 136
+          magenta 177 98 134
+          cyan 104 157 106
+          white 168 153 132
+          orange 254 128 25
         }
       }
 
