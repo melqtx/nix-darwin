@@ -1,0 +1,3 @@
+# empty_pattern: `{ ... }:` module headers are this repo's chosen style.
+# repeated_keys: dotted keys (home.username = ...) are preferred over nesting.
+disabled = ["empty_pattern", "repeated_keys"]
