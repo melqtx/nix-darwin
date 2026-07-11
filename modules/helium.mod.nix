@@ -20,10 +20,8 @@ let
     warn
     flip
     ;
-  inherit (lib.fixedPoints) fix;
   inherit (lib.strings) hasInfix;
 
-  extensions.consent-o-matic.id = "mdjildafknihdffpkfmmpnpoiajfjnjd";
   extensions.ublock-origin =
     let
       assets = importJSON "${inputs.ublock}/assets/assets.json";
@@ -103,7 +101,6 @@ let
     };
 
   # youtube
-  extensions.dearrow.id = "enamippconapkdmgfgjchkhakpfinmaj";
   extensions.sponsorblock.id = "mnjggcdmjocbbbhaepdhchncahnbgone";
 
   # visuals
@@ -113,28 +110,6 @@ let
   # navigation
   extensions.violentmonkey.id = "jinjaccalgkegednnccohejagnlnfdag";
   extensions.vimium-c.id = "hfjbmagddngcpeloejdejnfgbamkjaeg";
-
-  # services
-  extensions.kagi.id = "cdglnehniifkbagbbombnjghhcihifij";
-  extensions.keepassxc-browser = {
-    id = "oboonakemofpalcgghocfoadofidjkkk";
-
-    settings.toolbar_pin = "force_pinned";
-
-    policy.settings = fix (settings: {
-      autoFillRelevantCredential = true;
-
-      defaultGroup = "Web";
-      defaultPasskeyGroup = settings.defaultGroup;
-
-      downloadFaviconAfterSave = true;
-      passkeys = true;
-
-      useCompactMode = true;
-      useMonochromeToolbarIcon = true;
-      usePasswordGeneratorIcons = true;
-    });
-  };
 
   policy = {
     # extensions
