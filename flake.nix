@@ -20,6 +20,11 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+
+    ublock = {
+      url = "github:gorhill/uBlock";
+      flake = false;
+    };
   };
 
   outputs =
