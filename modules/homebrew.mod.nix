@@ -14,7 +14,9 @@
       onActivation = {
         autoUpdate = true;
         upgrade = true;
-        cleanup = "none";
+        # Remove anything brew-installed that isn't declared here, so strays
+        # can't shadow the nix copies (see: the go 1.26.5 incident).
+        cleanup = "uninstall";
       };
 
       brews = [
