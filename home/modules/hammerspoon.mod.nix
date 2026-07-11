@@ -153,6 +153,30 @@
             hs.notify.new({ title = "input stats", informativeText = text }):send()
           end, { "-lc", publishStatsScript }):start()
         end)
+
+        -- Hyper layer: right cmd is remapped to F18 at the HID level (see
+        -- darwin-defaults.mod.nix). Hold it for window-manager operations,
+        -- mirroring the ctrl/cmd hjkl scheme used in zellij.
+        local hyper = hs.hotkey.modal.new()
+        hs.hotkey.bind({}, "f18", function()
+          hyper:enter()
+        end, function()
+          hyper:exit()
+        end)
+
+        local function focusWindow(direction)
+          return function()
+            local win = hs.window.focusedWindow()
+            if win then
+              win["focusWindow" .. direction](win, nil, true, true)
+            end
+          end
+        end
+
+        hyper:bind({}, "h", focusWindow("West"))
+        hyper:bind({}, "j", focusWindow("South"))
+        hyper:bind({}, "k", focusWindow("North"))
+        hyper:bind({}, "l", focusWindow("East"))
       '';
     };
 }

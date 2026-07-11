@@ -2,6 +2,19 @@
 
 {
   flake.darwinModules.darwin-defaults = {
+    # Right cmd becomes F18, which hammerspoon treats as the Hyper layer
+    # (hold + hjkl = window focus). Applies to all keyboards; the internal
+    # one has no right cmd, so it only affects the HHKB in practice.
+    system.keyboard = {
+      enableKeyMapping = true;
+      userKeyMapping = [
+        {
+          HIDKeyboardModifierMappingSrc = 30064771303; # 0x7000000E7 right cmd
+          HIDKeyboardModifierMappingDst = 30064771181; # 0x70000006D F18
+        }
+      ];
+    };
+
     system.defaults = {
       dock = {
         autohide = true;
