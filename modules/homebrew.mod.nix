@@ -28,6 +28,7 @@
 
       casks = [
         "ghostty"
+        "helium-browser"
         "cloudflare-warp"
         "appcleaner"
         "notion-calendar"

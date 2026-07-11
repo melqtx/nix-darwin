@@ -9,6 +9,7 @@
       inputs.nix-homebrew.darwinModules.nix-homebrew
 
       config.flake.darwinModules.darwin-defaults
+      config.flake.darwinModules.helium
       config.flake.darwinModules.homebrew
       config.flake.darwinModules.packages
 
