@@ -50,12 +50,15 @@
         enable = true;
 
         shellInit = /* fish */ ''
-          fish_add_path /run/current-system/sw/bin
-          fish_add_path /opt/homebrew/bin
-          fish_add_path /opt/homebrew/sbin
-          fish_add_path ~/.local/bin
-          fish_add_path ~/go/bin
-          fish_add_path ~/.config/emacs/bin
+          # --path keeps this out of the universal fish_user_paths variable so
+          # the order is recomputed every shell; each line prepends, so later
+          # lines win. Nix must beat homebrew.
+          fish_add_path --move --path /opt/homebrew/sbin
+          fish_add_path --move --path /opt/homebrew/bin
+          fish_add_path --move --path /run/current-system/sw/bin
+          fish_add_path --move --path ~/.local/bin
+          fish_add_path --move --path ~/go/bin
+          fish_add_path --move --path ~/.config/emacs/bin
 
           set --global --export GPG_TTY (tty)
         '';
@@ -132,7 +135,7 @@
           rebuild = "${nh} darwin switch";
           dots = "cd ~/dots";
           zj = zellij;
-          fish = fish;
+          inherit fish;
         };
       };
     };
