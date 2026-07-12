@@ -25,7 +25,12 @@
         violentmonkey = "jinjaccalgkegednnccohejagnlnfdag";
       };
 
-      externalExtensionsDir = "/Library/Application Support/net.imput.helium/External Extensions";
+      # Upstream Chromium hardcodes this exact path on macOS for every build
+      # flavor (chrome/common/chrome_paths.cc, DIR_EXTERNAL_EXTENSIONS), and
+      # neither helium nor ungoogled-chromium patches it -- so helium reads
+      # external extensions from the "Google/Chrome" directory, and any real
+      # Chrome install will see (and prompt about) these seeds too.
+      externalExtensionsDir = "/Library/Application Support/Google/Chrome/External Extensions";
 
       externalSpec = pkgs.writeText "helium-external-extension.json" (toJSON {
         external_update_url = "https://clients2.google.com/service/update2/crx";
@@ -46,7 +51,11 @@
         /bin/rm -f "/Library/Managed Preferences/net.imput.helium"*.plist
         /usr/bin/killall cfprefsd 2>/dev/null || true
 
-        # helium: seed external extensions
+        # helium: seed external extensions (also drop the net.imput.helium
+        # seed dir a previous generation wrongly created -- helium never
+        # reads it, see externalExtensionsDir above)
+        /bin/rm -rf "/Library/Application Support/net.imput.helium/External Extensions"
+        /usr/bin/rmdir "/Library/Application Support/net.imput.helium" 2>/dev/null || true
         /bin/mkdir -p "${externalExtensionsDir}"
         ${installExtensions}
 
