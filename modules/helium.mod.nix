@@ -18,7 +18,6 @@
       extensions = {
         # ublock-origin ships preinstalled with helium
         dark-reader = "eimadpbcbfnmbkopoojfekhnkhdbieeh";
-        old-reddit-redirect = "dneaehbmnbhcippjikoajpoabadpodje";
         refined-github = "hlepfoohegkhhmjieoechaddaejaokhf";
         sponsorblock = "mnjggcdmjocbbbhaepdhchncahnbgone";
         vimium-c = "hfjbmagddngcpeloejdejnfgbamkjaeg";
@@ -61,7 +60,10 @@
         # reads it, see externalExtensionsDir above)
         /bin/rm -rf "/Library/Application Support/net.imput.helium/External Extensions"
         /usr/bin/rmdir "/Library/Application Support/net.imput.helium" 2>/dev/null || true
+        # the seed dir is fully owned by this module: clear stale seeds so
+        # dropping an extension here also drops its seed file
         /bin/mkdir -p "${externalExtensionsDir}"
+        /bin/rm -f "${externalExtensionsDir}"/*.json
         ${installExtensions}
 
         # helium: assert default browser as the console user (macOS shows a
