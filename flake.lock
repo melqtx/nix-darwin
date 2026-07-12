@@ -119,24 +119,7 @@
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs",
-        "ublock": "ublock"
-      }
-    },
-    "ublock": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1783729390,
-        "narHash": "sha256-HtKKFfr8Qwx0ig9WxbXpYwWcftxHDKHL/PsiOj1b5h4=",
-        "owner": "gorhill",
-        "repo": "uBlock",
-        "rev": "697b2f1099a97f7ffb5bf1ccd346822509f51527",
-        "type": "github"
-      },
-      "original": {
-        "owner": "gorhill",
-        "repo": "uBlock",
-        "type": "github"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
