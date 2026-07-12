@@ -32,8 +32,13 @@
       # Chrome install will see (and prompt about) these seeds too.
       externalExtensionsDir = "/Library/Application Support/Google/Chrome/External Extensions";
 
+      # Must be helium's web-store proxy, not clients2.google.com directly:
+      # helium strips prodversion from update queries (its downloader
+      # platform-spoofing patch), and Google's endpoint answers "noupdate"
+      # to any query without it. The proxy tolerates the stripped query and
+      # serves the CWS crx through services.helium.imput.net/ext/proxy.
       externalSpec = pkgs.writeText "helium-external-extension.json" (toJSON {
-        external_update_url = "https://clients2.google.com/service/update2/crx";
+        external_update_url = "https://services.helium.imput.net/ext";
       });
 
       installExtensions = concatLines (
