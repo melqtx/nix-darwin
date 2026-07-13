@@ -2,12 +2,15 @@
 
 {
   flake.homeModules.hammerspoon =
-    { config, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       statsPath = "${config.home.homeDirectory}/.local/state/input-stats.json";
-    in
-    {
-      home.file.".hammerspoon/init.lua".text = /* lua */ ''
+      hammerspoonConfig = pkgs.writeText "hammerspoon-init.lua" /* lua */ ''
         local statsPath = "${statsPath}"
         local flushEverySeconds = 5
 
@@ -138,20 +141,35 @@
         inputStatsTap:start()
         hs.shutdownCallback = flush
 
-        -- cmd+alt+ctrl+S publishes current stats to melqtx.com
+        -- publish stats to melqtx.com: cmd+alt+ctrl+S on demand, plus a
+        -- daily auto-publish. Scheduled runs stay silent unless something
+        -- actually happened (push or failure).
         local publishStatsScript = "/Users/melqtx/Documents/code/github/1337/bin/update-input-stats"
-        hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "S", function()
+        local function publishStats(interactive)
           flush()
-          hs.notify.new({ title = "input stats", informativeText = "publishing..." }):send()
+          if interactive then
+            hs.notify.new({ title = "input stats", informativeText = "publishing..." }):send()
+          end
           hs.task.new("/bin/zsh", function(exitCode, stdOut, stdErr)
             local text
             if exitCode == 0 then
               text = stdOut:gsub("%s+$", "")
+              if not interactive and text:find("no change") then
+                return
+              end
             else
               text = "failed: " .. stdErr:gsub("%s+$", "")
             end
             hs.notify.new({ title = "input stats", informativeText = text }):send()
           end, { "-lc", publishStatsScript }):start()
+        end
+
+        hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "S", function()
+          publishStats(true)
+        end)
+
+        publishStatsTimer = hs.timer.doAt("21:00", "1d", function()
+          publishStats(false)
         end)
 
         -- Hyper layer: right cmd is remapped to F18 at the HID level (see
@@ -177,6 +195,87 @@
         hyper:bind({}, "j", focusWindow("South"))
         hyper:bind({}, "k", focusWindow("North"))
         hyper:bind({}, "l", focusWindow("East"))
+
+        -- Modified Hyper chords are deliberately separate from the bare
+        -- hjkl focus bindings and from zellij/ghostty's Ctrl and Super keys.
+        local function withFocusedWindow(action)
+          return function()
+            local win = hs.window.focusedWindow()
+            if win then
+              action(win)
+            end
+          end
+        end
+
+        local function snapWindow(position)
+          return withFocusedWindow(function(win)
+            win:move(position, nil, true, 0)
+          end)
+        end
+
+        hyper:bind({ "shift" }, "h", snapWindow(hs.layout.left50))
+        hyper:bind({ "shift" }, "j", snapWindow(hs.layout.bottom50))
+        hyper:bind({ "shift" }, "k", snapWindow(hs.layout.top50))
+        hyper:bind({ "shift" }, "l", snapWindow(hs.layout.right50))
+
+        local function resizeWindow(widthDelta, heightDelta)
+          return withFocusedWindow(function(win)
+            local frame = win:frame()
+            local screenFrame = win:screen():frame()
+            local widthStep = math.floor(screenFrame.w * 0.05)
+            local heightStep = math.floor(screenFrame.h * 0.05)
+            local maxWidth = screenFrame.x + screenFrame.w - frame.x
+            local maxHeight = screenFrame.y + screenFrame.h - frame.y
+
+            frame.w = math.max(320, math.min(maxWidth, frame.w + widthDelta * widthStep))
+            frame.h = math.max(240, math.min(maxHeight, frame.h + heightDelta * heightStep))
+            win:setFrame(frame, 0)
+          end)
+        end
+
+        hyper:bind({ "ctrl" }, "h", resizeWindow(-1, 0))
+        hyper:bind({ "ctrl" }, "j", resizeWindow(0, 1))
+        hyper:bind({ "ctrl" }, "k", resizeWindow(0, -1))
+        hyper:bind({ "ctrl" }, "l", resizeWindow(1, 0))
+
+        hyper:bind({}, "f", withFocusedWindow(function(win)
+          win:toggleFullScreen()
+        end))
+
+        hyper:bind({}, "c", withFocusedWindow(function(win)
+          win:centerOnScreen(nil, true, 0)
+        end))
+
+        local function moveWindowToDisplay(index)
+          return withFocusedWindow(function(win)
+            local target = hs.screen.allScreens()[index]
+            if target then
+              win:moveToScreen(target, false, true, 0)
+            else
+              hs.alert.show("display " .. index .. " is not connected")
+            end
+          end)
+        end
+
+        hyper:bind({ "shift" }, "1", moveWindowToDisplay(1))
+        hyper:bind({ "shift" }, "2", moveWindowToDisplay(2))
+        hyper:bind({ "shift" }, "3", moveWindowToDisplay(3))
+      '';
+    in
+    {
+      # Hammerspoon starts as a login item and may launch before the separate
+      # Nix store volume is ready. Keep init.lua on the home volume instead of
+      # exposing the usual Home Manager symlink into /nix/store.
+      home.activation.installHammerspoonConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        configDir="${config.home.homeDirectory}/.hammerspoon"
+        configFile="$configDir/init.lua"
+        stagingFile="$configDir/.init.lua.home-manager"
+
+        if [[ -L "$configFile" ]] || ! /usr/bin/cmp -s "${hammerspoonConfig}" "$configFile"; then
+          $DRY_RUN_CMD /usr/bin/install -d -m 0755 "$configDir"
+          $DRY_RUN_CMD /usr/bin/install -m 0644 "${hammerspoonConfig}" "$stagingFile"
+          $DRY_RUN_CMD /bin/mv -f "$stagingFile" "$configFile"
+        fi
       '';
     };
 }

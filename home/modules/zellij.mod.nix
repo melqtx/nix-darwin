@@ -28,21 +28,21 @@
         copy_command "pbcopy"
         copy_clipboard "system"
 
-        theme "gruvbox-dark"
+        theme "vesper"
 
         themes {
-          gruvbox-dark {
-            fg 235 219 178
-            bg 40 40 40
-            black 40 40 40
-            red 204 36 29
-            green 152 151 26
-            yellow 215 153 33
-            blue 69 133 136
-            magenta 177 98 134
-            cyan 104 157 106
-            white 168 153 132
-            orange 254 128 25
+          vesper {
+            fg "#ffffff"
+            bg "#101010"
+            black "#101010"
+            red "#f5a191"
+            green "#90b99f"
+            yellow "#e6b99d"
+            blue "#aca1cf"
+            magenta "#e29eca"
+            cyan "#ea83a5"
+            white "#a0a0a0"
+            orange "#ffc799"
           }
         }
 

@@ -25,6 +25,7 @@
         pkgs.typescript-language-server
         pkgs.vscode-langservers-extracted
         pkgs.yaml-language-server
+        pkgs.lua-language-server
 
         pkgs.haskellPackages.fourmolu
         pkgs.haskell-language-server

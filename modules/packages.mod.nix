@@ -101,6 +101,8 @@
         pkgs.btop
         pkgs.bottom
         pkgs.bandwhich
+        pkgs.nmap
+        pkgs.mtr
 
         pkgs.tldr
         pkgs.llm
@@ -111,6 +113,7 @@
         pkgs.pfetch-rs
         pkgs.tokei
         pkgs.cloc
+        pkgs.glow
         pkgs.fastfetch
         pkgs.hyperfine
         pkgs.watchexec
@@ -136,7 +139,9 @@
         pkgs.fnm
         pkgs.cmake
         pkgs.gnumake
+        pkgs.ninja
         pkgs.libtool
+        pkgs.sccache
         pkgs.sqlite
         pkgs.gnutls
         pkgs.zstd

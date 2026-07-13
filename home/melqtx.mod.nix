@@ -5,10 +5,12 @@
     imports = [
       config.flake.homeModules.fish
       config.flake.homeModules.starship
+      config.flake.homeModules.tooling
       config.flake.homeModules.ghostty
       config.flake.homeModules.zellij
       config.flake.homeModules.helix
       config.flake.homeModules.version-control
+      config.flake.homeModules.claude-code
       config.flake.homeModules.language-tools
       config.flake.homeModules.emacs
       config.flake.homeModules.hammerspoon

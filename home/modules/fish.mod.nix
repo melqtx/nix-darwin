@@ -74,6 +74,35 @@
         '';
 
         functions = {
+          # elenapan's bin/colorpanes (GekkoP's "panes" art) in gruvbox,
+          # hardcoded so it doesn't depend on the terminal palette
+          fish_greeting = /* fish */ ''
+            set -l body cc241d 98971a d79921 458588 b16286 689d6a d65d0e
+            set -l edge fb4934 b8bb26 fabd2f 83a598 d3869b 8ec07c fe8019
+
+            echo
+            for row in 1 2 3
+                echo -n ' '
+                for i in (seq 7)
+                    set_color $body[$i]
+                    echo -n '███'
+                    set_color $edge[$i]
+                    test $row -eq 1; and echo -n '▄'; or echo -n '█'
+                    echo -n '  '
+                end
+                set_color normal
+                echo
+            end
+            echo -n ' '
+            for i in (seq 7)
+                set_color $edge[$i]
+                echo -n ' ▀▀▀  '
+            end
+            set_color normal
+            echo
+            echo
+          '';
+
           battle = /* fish */ ''
             builtin cd ${config.home.homeDirectory}/code
             ${zellij} --layout battlestation
@@ -82,10 +111,15 @@
           battlestation = /* fish */ ''
             battle
           '';
+
+          # MAS installs require interactive root and sometimes Apple Account
+          # authentication, so keep them out of automatic Darwin activation.
+          install-mas-apps = /* fish */ ''
+            /opt/homebrew/bin/mas get 310633997 408981434 6745342698
+          '';
         };
 
         shellAliases = {
-          cd = "z";
           zi = "${zoxide} query --interactive";
           yy = yazi;
 
@@ -132,7 +166,9 @@
           e = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
           tree = "${eza} --no-quotes --tree";
-          rebuild = "${nh} darwin switch";
+          # Use an explicit path flake so newly created modules work before
+          # their first commit; Git flake snapshots omit untracked files.
+          rebuild = "${nh} darwin switch path:${config.home.homeDirectory}/dots";
           dots = "cd ~/dots";
           zj = zellij;
           inherit fish;

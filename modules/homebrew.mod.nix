@@ -20,10 +20,12 @@
       };
 
       brews = [
+        "mas"
         "ffmpeg"
         "imagemagick"
         "vnstat"
         "cloudflare-wrangler"
+        "mole"
       ];
 
       casks = [
@@ -36,9 +38,10 @@
         "firefox"
         "spotify"
         "discord"
-        "whatsapp"
+        "vesktop"
         "telegram"
         "element"
+        "little-snitch"
         "macs-fan-control"
         "hammerspoon"
         "zen"
@@ -52,9 +55,13 @@
         "t3-code"
         "orbstack"
 
-        "font-jetbrains-mono-nerd-font"
         "prismlauncher"
       ];
+
+      # MAS 7 requires interactive root and, for newly acquired apps, Apple
+      # Account authentication. nix-darwin runs this Brew bundle as the
+      # primary user, so homebrew.masApps would make every rebuild fail.
+      # `install-mas-apps` in the Fish module performs this interactive step.
     };
   };
 }

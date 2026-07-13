@@ -1,0 +1,21 @@
+! Title: melqtx: YouTube shorts-be-gone + declutter
+! Expires: 7 days
+www.youtube.com##ytd-guide-entry-renderer:has(a[title="Shorts"])
+www.youtube.com##ytd-mini-guide-entry-renderer[aria-label="Shorts"]
+www.youtube.com##ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts])
+www.youtube.com##ytd-rich-shelf-renderer[is-shorts]
+www.youtube.com##ytd-reel-shelf-renderer
+www.youtube.com##grid-shelf-view-model:has(a[href^="/shorts/"])
+www.youtube.com##ytd-rich-item-renderer:has(a[href^="/shorts/"])
+www.youtube.com##ytd-video-renderer:has(a[href^="/shorts/"])
+www.youtube.com##ytd-grid-video-renderer:has(a[href^="/shorts/"])
+www.youtube.com##yt-lockup-view-model:has(a[href^="/shorts/"])
+www.youtube.com##yt-tab-shape[tab-title="Shorts"]
+m.youtube.com##ytm-reel-shelf-renderer
+m.youtube.com##ytm-pivot-bar-item-renderer:has-text(Shorts)
+www.youtube.com##ytd-video-preview
+www.youtube.com##.ytp-ce-element
+||youtube.com/youtubei/v1/log_event$xhr
+||youtube.com/csi_204$
+||youtube.com/ptracking$
+||play.google.com/log$xhr,3p

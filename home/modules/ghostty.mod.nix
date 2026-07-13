@@ -10,49 +10,34 @@
     in
     {
       xdg.configFile."ghostty/config".text = /* conf */ ''
-        font-family = Berkeley Mono 2.0
+        font-family = FiraCode
         font-size = 15
+
+        theme = vesper
 
         command = direct:${zellij} --layout clean
 
-        # Gruvbox Dark: the warm browns and oranges suit the desktop wallpaper.
-        background = 282828
-        foreground = ebdbb2
-        cursor-color = fabd2f
-        selection-background = 504945
-        selection-foreground = ebdbb2
-
-        palette = 0=#282828
-        palette = 1=#cc241d
-        palette = 2=#98971a
-        palette = 3=#d79921
-        palette = 4=#458588
-        palette = 5=#b16286
-        palette = 6=#689d6a
-        palette = 7=#a89984
-        palette = 8=#928374
-        palette = 9=#fb4934
-        palette = 10=#b8bb26
-        palette = 11=#fabd2f
-        palette = 12=#83a598
-        palette = 13=#d3869b
-        palette = 14=#8ec07c
-        palette = 15=#ebdbb2
-
         shell-integration = detect
+        shell-integration-features = no-cursor,sudo,no-title
 
-        window-decoration = false
-        macos-titlebar-style = hidden
+        fullscreen = false
+        macos-titlebar-style = transparent
+        window-colorspace = display-p3
+        window-width = 120
+        window-height = 1000
         gtk-tabs-location = hidden
 
         window-padding-x = 8
         window-padding-y = 8
 
-        background-opacity = 0.95
-        background-blur-radius = 20
+        background-opacity = 1
+        background-blur-radius = 40
+        unfocused-split-opacity = 0.50
 
         cursor-style = block
         cursor-style-blink = false
+        cursor-color = #ffc799
+        cursor-text = #101010
 
         confirm-close-surface = false
 
@@ -63,6 +48,18 @@
         window-inherit-working-directory = true
 
         mouse-hide-while-typing = true
+
+        auto-update-channel = tip
+
+        quick-terminal-position = center
+        quick-terminal-screen = mouse
+        quick-terminal-size = 100%,100%
+        quick-terminal-animation-duration = 0
+        quick-terminal-autohide = false
+        quick-terminal-keyboard-interactivity = exclusive
+
+        keybind = global:ctrl+`=toggle_quick_terminal
+        keybind = shift+enter=text:\x1b\r
 
         keybind = super+t=unbind
         keybind = super+w=unbind
