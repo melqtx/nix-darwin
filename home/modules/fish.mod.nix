@@ -117,6 +117,18 @@
           install-mas-apps = /* fish */ ''
             /opt/homebrew/bin/mas get 310633997 408981434 6745342698
           '';
+
+          mc = /* fish */ ''
+            command mkdir -p $argv[1]; and builtin cd $argv[1]
+          '';
+
+          mcg = /* fish */ ''
+            mc $argv[1]; and ${jj} git init
+          '';
+
+          realwhich = /* fish */ ''
+            readlink -f (command --search $argv[1])
+          '';
         };
 
         shellAliases = {
