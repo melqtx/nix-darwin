@@ -33,6 +33,14 @@
         };
 
         aliases = {
+          ".." = [
+            "edit"
+            "@-"
+          ];
+          ",," = [
+            "edit"
+            "@+"
+          ];
           a = [
             "file"
             "track"
@@ -40,8 +48,21 @@
           c = [ "commit" ];
           d = [ "diff" ];
           e = [ "edit" ];
+          f = [
+            "git"
+            "fetch"
+          ];
           l = [ "log" ];
+          la = [
+            "log"
+            "--revisions"
+            "::"
+          ];
           n = [ "new" ];
+          p = [
+            "git"
+            "push"
+          ];
           resolve-ast = [
             "resolve"
             "--tool"
@@ -49,6 +70,11 @@
           ];
           s = [ "status" ];
           sh = [ "show" ];
+          sq = [ "squash" ];
+          sqi = [
+            "squash"
+            "--interactive"
+          ];
           u = [ "undo" ];
         };
 
