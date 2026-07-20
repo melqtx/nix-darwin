@@ -82,6 +82,7 @@
 
         pkgs.eza
         pkgs.bat
+        pkgs.less
         pkgs.yazi
         pkgs.wget
         pkgs.aria2
