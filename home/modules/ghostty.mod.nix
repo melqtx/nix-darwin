@@ -10,7 +10,10 @@
     in
     {
       xdg.configFile."ghostty/config".text = /* conf */ ''
-        font-family = Fira Code
+        # The plain fira-code package registers only "Light" faces on macOS
+        # (no true Regular/Bold), which renders everything semi-bold. The
+        # nerd-fonts build ships a proper face set.
+        font-family = FiraCode Nerd Font Mono
         font-size = 15
 
         theme = Vesper
