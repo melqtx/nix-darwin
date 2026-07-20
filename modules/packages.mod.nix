@@ -16,20 +16,20 @@
 
       pi = pkgs.buildNpmPackage (finalAttrs: {
         pname = "pi-coding-agent";
-        version = "0.80.6";
+        version = "0.82.0";
 
         src = pkgs.fetchurl {
           url = "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-${finalAttrs.version}.tgz";
-          hash = "sha256-KndjRkCy2G2Q0kCHu2dVns8jZuD7UqQsVe7UFhR9pBE=";
+          hash = "sha256-qcnX+GGnUIr15RbUk6A+rB/vNvi1b7DSBNpkOVDl2wg=";
         };
 
         # the published shrinkwrap lacks integrity for pi's own sibling
         # packages, and devDependencies are absent from it entirely
         postPatch = ''
           ${lib.getExe pkgs.jq} '
-            .packages["node_modules/@earendil-works/pi-agent-core"].integrity = "sha512-Lvn89ko42h5ETUb6Z0Ku6ldskEqXaTdQBYvSa0+7bdG9V6rUEpXptv5e0OVZ1HDcvi8s6/2lGCQWsxKX+DFHNw==" |
-            .packages["node_modules/@earendil-works/pi-ai"].integrity = "sha512-7xfLk8sANBp+bpPEbjoOZTbPxsa+++b1JXAoSJsNa3vbs9AHHEclmvg54XLQcxH+fuwaeti/g2jeIfJ+mVYLpA==" |
-            .packages["node_modules/@earendil-works/pi-tui"].integrity = "sha512-bSuzS4EVSqEPj/Qr/p9eqCESfKsGuDNbl77EGci8Iaqqt/C/XCBZL1MjXaxSWW1NsT5afjp/Cb0NTPzOLv/aPA=="
+            .packages["node_modules/@earendil-works/pi-agent-core"].integrity = "sha512-bnS9DpOKK5T/F/gQkaOnYdMsuuciWiScfAHHWC+k5OQ0HxjSqMFQvp8keurULLoT4+v8NHv4V14pNvd4hsfC0Q==" |
+            .packages["node_modules/@earendil-works/pi-ai"].integrity = "sha512-8MvW9+zno13sXDuT2kFMnWeTNUufUhPeZDRVO+igGoBRCDWgn7Xh2FkRQI1mRuet6QhF4ENQuLYdIAOyG6BhNw==" |
+            .packages["node_modules/@earendil-works/pi-tui"].integrity = "sha512-9IDjQOXne7t9l2s2YcjnIBxsVNVPE7qScVSB3YmFlXsBW4pfo2gOElTxggV84KrRiGqABnlFPBWbf0k54hszHQ=="
           ' npm-shrinkwrap.json > package-lock.json
           cp package-lock.json npm-shrinkwrap.json
 
@@ -37,7 +37,7 @@
           mv package.json.tmp package.json
         '';
 
-        npmDepsHash = "sha256-YCOHHaIvYWj/OgaIQgs/HzhgslbyVLbUe98kEP5F0Jo=";
+        npmDepsHash = "sha256-N/HHIn5dQKEeljD+3qod4TvfGFnI6wWFJ7Q3LIBoPXc=";
 
         dontNpmBuild = true;
 
