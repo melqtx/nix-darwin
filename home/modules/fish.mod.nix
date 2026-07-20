@@ -135,6 +135,13 @@
           zi = "${zoxide} query --interactive";
           yy = yazi;
 
+          # mtr-packet needs raw sockets; no setuid wrappers on nix-darwin
+          mtr = "sudo mtr";
+
+          # nixpkgs peaclock links GNU libstdc++, which only knows the C
+          # locale on darwin and aborts on en_IN.UTF-8
+          peaclock = "env LC_ALL=C peaclock";
+
           js = "${jj} status";
           ja = "${jj} file track";
           ga = "${jj} file track";
