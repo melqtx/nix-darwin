@@ -213,9 +213,10 @@
           end)
         end
 
+        -- hs.layout has no top50/bottom50 equivalents, only left/right
         hyper:bind({ "shift" }, "h", snapWindow(hs.layout.left50))
-        hyper:bind({ "shift" }, "j", snapWindow(hs.layout.bottom50))
-        hyper:bind({ "shift" }, "k", snapWindow(hs.layout.top50))
+        hyper:bind({ "shift" }, "j", snapWindow(hs.geometry.rect(0, 0.5, 1, 0.5)))
+        hyper:bind({ "shift" }, "k", snapWindow(hs.geometry.rect(0, 0, 1, 0.5)))
         hyper:bind({ "shift" }, "l", snapWindow(hs.layout.right50))
 
         local function resizeWindow(widthDelta, heightDelta)
