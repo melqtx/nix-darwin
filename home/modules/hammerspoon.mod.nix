@@ -242,6 +242,12 @@
           win:toggleFullScreen()
         end))
 
+        -- Unlike native fullscreen above, this fills the screen without
+        -- moving the window to its own Space.
+        hyper:bind({ "shift" }, "f", withFocusedWindow(function(win)
+          win:maximize(0)
+        end))
+
         hyper:bind({}, "c", withFocusedWindow(function(win)
           win:centerOnScreen(nil, true, 0)
         end))
