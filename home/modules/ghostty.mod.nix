@@ -10,10 +10,10 @@
     in
     {
       xdg.configFile."ghostty/config".text = /* conf */ ''
-        font-family = FiraCode
+        font-family = Fira Code
         font-size = 15
 
-        theme = vesper
+        theme = Vesper
 
         command = direct:${zellij} --layout clean
 
@@ -39,6 +39,8 @@
         cursor-color = #ffc799
         cursor-text = #101010
 
+        scrollback-limit = 104857600
+
         confirm-close-surface = false
 
         copy-on-select = clipboard
@@ -48,8 +50,6 @@
         window-inherit-working-directory = true
 
         mouse-hide-while-typing = true
-
-        auto-update-channel = tip
 
         quick-terminal-position = center
         quick-terminal-screen = mouse
