@@ -2,14 +2,18 @@
 
 {
   flake.homeModules.claude-code =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
+      inherit (lib.lists) singleton;
+
+      # A space before the trailing * enforces a word boundary: "ls *"
+      # matches `ls -la` and bare `ls`, but not `lsof`.
       allowedCommands = [
-        "rg*"
-        "ls*"
-        "eza*"
-        "fd*"
-        "tokei*"
+        "rg *"
+        "ls *"
+        "eza *"
+        "fd *"
+        "tokei *"
 
         "jj bookmark list*"
         "jj config get*"
@@ -76,10 +80,7 @@
           ];
 
           # A recursive find over the Nix store can effectively hang a session.
-          deny = [
-            "Bash(find /nix/store*)"
-            "Bash(find /nix/store/*)"
-          ];
+          deny = singleton "Bash(find /nix/store*)";
         };
 
         env = {
