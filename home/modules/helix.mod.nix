@@ -2,10 +2,98 @@
 
 {
   flake.homeModules.helix =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (lib.meta) getExe;
-      inherit (lib.lists) singleton;
+
+      bundleIdentifier = "dev.helix-editor.Helix";
+
+      helixLauncher = pkgs.writeShellScript "helix-macos-launcher" ''
+        exec /usr/bin/open -na /Applications/Ghostty.app --args \
+          -e ${getExe pkgs.helix} "$@"
+      '';
+
+      helixInfoPlist = pkgs.writeText "helix-info.plist" ''
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+          <key>CFBundleDevelopmentRegion</key>
+          <string>en</string>
+          <key>CFBundleDisplayName</key>
+          <string>Helix</string>
+          <key>CFBundleDocumentTypes</key>
+          <array>
+            <dict>
+              <key>CFBundleTypeName</key>
+              <string>Text document</string>
+              <key>CFBundleTypeRole</key>
+              <string>Editor</string>
+              <key>LSHandlerRank</key>
+              <string>Owner</string>
+              <key>LSItemContentTypes</key>
+              <array>
+                <string>public.text</string>
+                <string>public.plain-text</string>
+                <string>public.source-code</string>
+                <string>public.shell-script</string>
+                <string>org.nixos.nix-source</string>
+              </array>
+            </dict>
+          </array>
+          <key>CFBundleExecutable</key>
+          <string>Helix</string>
+          <key>CFBundleIdentifier</key>
+          <string>${bundleIdentifier}</string>
+          <key>CFBundleInfoDictionaryVersion</key>
+          <string>6.0</string>
+          <key>CFBundleName</key>
+          <string>Helix</string>
+          <key>CFBundlePackageType</key>
+          <string>APPL</string>
+          <key>CFBundleShortVersionString</key>
+          <string>${pkgs.helix.version}</string>
+          <key>CFBundleVersion</key>
+          <string>${pkgs.helix.version}</string>
+          <key>LSUIElement</key>
+          <true/>
+          <key>NSHighResolutionCapable</key>
+          <true/>
+          <key>UTExportedTypeDeclarations</key>
+          <array>
+            <dict>
+              <key>UTTypeConformsTo</key>
+              <array>
+                <string>public.source-code</string>
+              </array>
+              <key>UTTypeDescription</key>
+              <string>Nix source</string>
+              <key>UTTypeIdentifier</key>
+              <string>org.nixos.nix-source</string>
+              <key>UTTypeTagSpecification</key>
+              <dict>
+                <key>public.filename-extension</key>
+                <array>
+                  <string>nix</string>
+                </array>
+              </dict>
+            </dict>
+          </array>
+        </dict>
+        </plist>
+      '';
+
+      helixApp = pkgs.runCommandLocal "helix-macos-app" { } ''
+        app="$out/Applications/Helix.app/Contents"
+        mkdir -p "$app/MacOS"
+        install -m 755 ${helixLauncher} "$app/MacOS/Helix"
+        install -m 644 ${helixInfoPlist} "$app/Info.plist"
+      '';
 
       githubPermalink = pkgs.callPackage (
         {
@@ -41,7 +129,31 @@
       ) { };
     in
     {
-      home.packages = singleton pkgs.helix;
+      home.packages = [
+        helixApp
+        pkgs.helix
+      ];
+
+      home.activation.setHelixAsDefaultEditor = lib.hm.dag.entryAfter [ "copyApps" ] ''
+        app="${config.home.homeDirectory}/Applications/Home Manager Apps/Helix.app"
+        lsregister="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+
+        $DRY_RUN_CMD "$lsregister" -f "$app"
+
+        for contentType in \
+          public.text \
+          public.plain-text \
+          public.source-code \
+          public.shell-script \
+          public.json \
+          public.yaml \
+          public.xml \
+          net.daringfireball.markdown \
+          org.nixos.nix-source
+        do
+          $DRY_RUN_CMD ${getExe pkgs.duti} -s ${bundleIdentifier} "$contentType" all
+        done
+      '';
 
       xdg.configFile."helix/config.toml".text = /* toml */ ''
         theme = "catppuccin_mocha"
