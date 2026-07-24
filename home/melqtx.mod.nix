@@ -11,6 +11,7 @@
       config.flake.homeModules.helix
       config.flake.homeModules.version-control
       config.flake.homeModules.claude-code
+      config.flake.homeModules.pi
       config.flake.homeModules.language-tools
       config.flake.homeModules.emacs
       config.flake.homeModules.hammerspoon
