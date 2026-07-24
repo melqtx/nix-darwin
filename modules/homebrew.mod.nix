@@ -30,6 +30,8 @@
 
       casks = [
         "ghostty"
+        "kitty"
+        "wezterm"
         "helium-browser"
         "cloudflare-warp"
         "appcleaner"
