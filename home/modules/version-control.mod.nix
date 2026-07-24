@@ -12,7 +12,7 @@
           };
 
           init.defaultBranch = "main";
-          core.editor = "nvim";
+          core.editor = "hx";
 
           fetch = {
             prune = true;
