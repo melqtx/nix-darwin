@@ -26,7 +26,7 @@
 
                :ui
                doom
-               doom-dashboard
+               dashboard
                hl-todo
                modeline
                ophints
