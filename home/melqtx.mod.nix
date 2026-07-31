@@ -16,6 +16,7 @@
       config.flake.homeModules.emacs
       config.flake.homeModules.hammerspoon
       config.flake.homeModules.helium
+      config.flake.homeModules.vesktop
     ];
 
     home.username = "melqtx";

@@ -151,6 +151,15 @@
       system.activationScripts.postActivation.text = mkAfter ''
         /usr/bin/install -d -o ${primaryUser} -g staff ${escapeShellArg config.system.defaults.screencapture.location}
         /usr/bin/chflags nohidden ${escapeShellArg userHome}/Library
+
+        # Homebrew can replace app bundles during activation; refresh
+        # LaunchServices so repaired Discord/Vesktop bundles are discoverable.
+        lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+        for app in /Applications/Discord.app /Applications/Vesktop.app; do
+          if [ -d "$app" ]; then
+            "$lsregister" -f "$app"
+          fi
+        done
       '';
     };
 }

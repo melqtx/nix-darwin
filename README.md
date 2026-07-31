@@ -1,18 +1,12 @@
 # dots
 
-Tiny Nix-powered macOS den. Terminal-first, jj-friendly, and only mildly haunted by yak shaving.
-
-See [`guide.md`](guide.md) for the architecture, activation workflow, package
-ownership, application behavior, and complete managed-keybinding reference.
-
-## Tree
-
 ```text
 .
 ├── README.md
-├── guide.md
+├── checks.mod.nix
 ├── flake.lock
 ├── flake.nix
+├── formatter.mod.nix
 ├── home
 │   ├── melqtx.mod.nix
 │   └── modules
@@ -22,11 +16,15 @@ ownership, application behavior, and complete managed-keybinding reference.
 │       ├── ghostty.mod.nix
 │       ├── hammerspoon.mod.nix
 │       ├── helium.mod.nix
+│       ├── helium
+│       │   └── ublock-youtube.txt
 │       ├── helix.mod.nix
 │       ├── language-tools.mod.nix
+│       ├── pi.mod.nix
 │       ├── starship.mod.nix
 │       ├── tooling.mod.nix
 │       ├── version-control.mod.nix
+│       ├── vesktop.mod.nix
 │       └── zellij.mod.nix
 ├── hosts
 │   └── prometheus
@@ -37,6 +35,7 @@ ownership, application behavior, and complete managed-keybinding reference.
 │   ├── helium.mod.nix
 │   ├── homebrew.mod.nix
 │   └── packages.mod.nix
-└── options
-    └── flake-outputs.mod.nix
+├── options
+│   └── flake-outputs.mod.nix
+└── statix.toml
 ```

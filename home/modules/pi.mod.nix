@@ -13,16 +13,30 @@
 
       agentDir = "${config.home.homeDirectory}/.pi/agent";
 
-      # davis7dotsh/my-pi-setup, main branch. Bump the rev/hash together to
-      # pull in upstream changes; the author warns it "changes a ton", so
-      # only extensions/themes/skills/package.json are vendored here and
-      # auth.json, sessions/, settings.json stay untouched as real state.
-      piSetupSrc = pkgs.fetchFromGitHub {
-        owner = "davis7dotsh";
-        repo = "my-pi-setup";
-        rev = "21f40f41fb98e088281a6fcd512388d82bddf911";
-        hash = "sha256-3UfFeriLBXCnI4ensGUIPIrMgcGUFtRmrW9M2N+tCP4=";
-      };
+      # Prefer the editable local setup when it is visible to Nix. The
+      # fallback keeps builds working in contexts that cannot see ~/Documents
+      # (for example a remote nix-daemon or another machine).
+      localPiSetup = /Users/melqtx/Documents/code/playground/my-pi-setup;
+
+      piSetupSrc =
+        if builtins.pathExists localPiSetup then
+          builtins.path {
+            path = localPiSetup;
+            name = "my-pi-setup";
+            filter =
+              path: _:
+              let
+                baseName = builtins.baseNameOf path;
+              in
+              baseName != ".git" && baseName != "node_modules";
+          }
+        else
+          pkgs.fetchFromGitHub {
+            owner = "davis7dotsh";
+            repo = "my-pi-setup";
+            rev = "21f40f41fb98e088281a6fcd512388d82bddf911";
+            hash = "sha256-3UfFeriLBXCnI4ensGUIPIrMgcGUFtRmrW9M2N+tCP4=";
+          };
 
       emptySettings = pkgs.writeText "pi-empty-settings.json" "{}";
     in
@@ -69,8 +83,21 @@
         fi
 
         # jq only reads here; the actual write goes through tee so it's the
-        # one part of this line $DRY_RUN_CMD can gate.
-        merged="$(${getExe pkgs.jq} '.theme = "github-dark-default"' "$settingsFile" 2>/dev/null)"
+        # one part of this line $DRY_RUN_CMD can gate. Preserve personal Pi
+        # settings while keeping the setup's theme/resource paths in sync.
+        merged="$(${getExe pkgs.jq} '
+          .theme = "violet-night" |
+          .themes = ["themes"] |
+          .skills = ["skills"] |
+          .extensions = [
+            "extensions/ui-customization",
+            "extensions/git-info",
+            "extensions/model-info",
+            "extensions/file-search",
+            "extensions/copy-all"
+          ] |
+          .packages = ((.packages // []) | if index("npm:@pandi-coding-agent/plan") then . else . + ["npm:@pandi-coding-agent/plan"] end)
+        ' "$settingsFile" 2>/dev/null)"
         if [ -n "$merged" ]; then
           printf '%s' "$merged" | $DRY_RUN_CMD /usr/bin/tee "$settingsFile" > /dev/null
         fi

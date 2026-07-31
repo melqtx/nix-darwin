@@ -20,6 +20,12 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # nix-homebrew pins brew 6.0.1, but cask definitions come from the JSON API
+    # and now use the `command_wrapper` stanza, added in brew 6.0.13. Without
+    # this override every `brew bundle` fails to fetch any cask. Note the
+    # derivation is still named brew-6.0.1-patched: nix-homebrew reads the
+    # version string from its own flake.lock, so the name ignores this pin.
+    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew/6.0.14";
   };
 
   outputs =

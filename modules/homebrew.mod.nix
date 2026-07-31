@@ -54,6 +54,7 @@
         "vlc"
         "obsidian"
         "raycast"
+        "vorssaint"
         "t3-code"
         "orbstack"
 

@@ -58,6 +58,7 @@
           fish_add_path --move --path /run/current-system/sw/bin
           fish_add_path --move --path ~/.local/bin
           fish_add_path --move --path ~/go/bin
+          fish_add_path --move --path ~/.cargo/bin
           fish_add_path --move --path ~/.config/emacs/bin
 
           set --global --export GPG_TTY (tty)
