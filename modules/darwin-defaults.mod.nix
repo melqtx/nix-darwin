@@ -109,6 +109,55 @@
             DSDontWriteUSBStores = true;
           };
 
+          # Keep Mission Control's native Ctrl+1..4 shortcuts declarative.
+          # These are the symbolic hotkey IDs for switching to Spaces 1-4.
+          "com.apple.symbolichotkeys".AppleSymbolicHotKeys = {
+            "118" = {
+              enabled = true;
+              value = {
+                parameters = [
+                  65535
+                  18
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+            "119" = {
+              enabled = true;
+              value = {
+                parameters = [
+                  65535
+                  19
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+            "120" = {
+              enabled = true;
+              value = {
+                parameters = [
+                  65535
+                  20
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+            "121" = {
+              enabled = true;
+              value = {
+                parameters = [
+                  65535
+                  21
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+          };
+
           "com.apple.finder" = {
             DisableAllAnimations = true;
             WarnOnEmptyTrash = false;

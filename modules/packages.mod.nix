@@ -61,6 +61,7 @@
         pkgs.comma
 
         pkgs.fish
+        pkgs.carapace
         pkgs.starship
         pkgs.zellij
         pkgs.neovim
