@@ -13,30 +13,10 @@
 
       agentDir = "${config.home.homeDirectory}/.pi/agent";
 
-      # Prefer the editable local setup when it is visible to Nix. The
-      # fallback keeps builds working in contexts that cannot see ~/Documents
-      # (for example a remote nix-daemon or another machine).
-      localPiSetup = /Users/melqtx/Documents/code/playground/my-pi-setup;
-
-      piSetupSrc =
-        if builtins.pathExists localPiSetup then
-          builtins.path {
-            path = localPiSetup;
-            name = "my-pi-setup";
-            filter =
-              path: _:
-              let
-                baseName = builtins.baseNameOf path;
-              in
-              baseName != ".git" && baseName != "node_modules";
-          }
-        else
-          pkgs.fetchFromGitHub {
-            owner = "davis7dotsh";
-            repo = "my-pi-setup";
-            rev = "21f40f41fb98e088281a6fcd512388d82bddf911";
-            hash = "sha256-3UfFeriLBXCnI4ensGUIPIrMgcGUFtRmrW9M2N+tCP4=";
-          };
+      # Keep this as a string: the nix daemon cannot necessarily read
+      # ~/Documents during evaluation, while the activation script runs as
+      # the user and can read the local checkout directly.
+      piSetupSrc = "/Users/melqtx/Documents/code/playground/my-pi-setup";
 
       emptySettings = pkgs.writeText "pi-empty-settings.json" "{}";
     in
@@ -50,6 +30,11 @@
         export PATH="${pkgs.nodejs_24}/bin:$PATH"
 
         $DRY_RUN_CMD /bin/mkdir -p "${agentDir}"
+
+        if [ ! -d "${piSetupSrc}" ]; then
+          echo "Pi setup not found at ${piSetupSrc}" >&2
+          exit 1
+        fi
 
         # Each extension is its own little npm package (effect, firecrawl,
         # etc. as *its* dependencies, not the root's), so node_modules lives
