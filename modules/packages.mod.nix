@@ -68,7 +68,6 @@
         pkgs.starship
         pkgs.zellij
         pkgs.neovim
-        pkgs.emacs30
 
         pkgs.zoxide
         pkgs.atuin

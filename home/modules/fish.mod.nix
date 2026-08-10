@@ -20,7 +20,7 @@
       delta = getExe pkgs.delta;
       direnv = getExe pkgs.direnv;
       dust = getExe pkgs.dust;
-      emacsclient = getExe' pkgs.emacs30 "emacsclient";
+      emacsclient = getExe' config.programs.doom-emacs.finalEmacsPackage "emacsclient";
       eza = getExe pkgs.eza;
       fd = getExe pkgs.fd;
       fish = getExe pkgs.fish;
@@ -58,7 +58,6 @@
           fish_add_path --move --path ~/.local/bin
           fish_add_path --move --path ~/go/bin
           fish_add_path --move --path ~/.cargo/bin
-          fish_add_path --move --path ~/.config/emacs/bin
           fish_add_path --move --path /run/current-system/sw/bin
 
           set --global --export GPG_TTY (tty)

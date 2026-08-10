@@ -30,6 +30,7 @@
             useGlobalPkgs = true;
             useUserPackages = true;
 
+            sharedModules = [ inputs.nix-doom-emacs-unstraightened.homeModule ];
             users.melqtx = config.flake.homeModules.melqtx;
           };
 

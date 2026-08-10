@@ -49,21 +49,14 @@
     in
     {
       system.activationScripts.postActivation.text = mkAfter ''
-        # helium: purge leftover managed policies; the dropped policy module
-        # left plists behind whose ExtensionInstallBlocklist=* kept blocking
-        # every extension install (cfprefsd caches them, hence the killall)
-        /bin/rm -f "/Library/Managed Preferences/net.imput.helium"*.plist
-        /usr/bin/killall cfprefsd 2>/dev/null || true
-
-        # helium: seed external extensions (also drop the net.imput.helium
-        # seed dir a previous generation wrongly created -- helium never
-        # reads it, see externalExtensionsDir above)
+        # Drop the Helium-specific seed directory created by an older
+        # generation. Chromium never reads this location.
         /bin/rm -rf "/Library/Application Support/net.imput.helium/External Extensions"
         /usr/bin/rmdir "/Library/Application Support/net.imput.helium" 2>/dev/null || true
-        # the seed dir is fully owned by this module: clear stale seeds so
-        # dropping an extension here also drops its seed file
+
+        # This directory is shared with Chrome and other management tools.
+        # Install only the extension IDs owned here; never clear it wholesale.
         /bin/mkdir -p "${externalExtensionsDir}"
-        /bin/rm -f "${externalExtensionsDir}"/*.json
         ${installExtensions}
 
         # helium: assert default browser as the console user (macOS shows a

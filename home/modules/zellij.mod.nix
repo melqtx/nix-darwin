@@ -17,6 +17,7 @@
       xdg.configFile."zellij/config.kdl".text = /* kdl */ ''
         default_shell "${fish}"
         default_layout "clean"
+        on_force_close "detach"
 
         pane_frames false
         simplified_ui true

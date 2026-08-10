@@ -18,7 +18,7 @@
 
         theme = Vesper
 
-        command = direct:${zellij} --layout clean
+        command = direct:${zellij} attach --create main
 
         shell-integration = detect
         shell-integration-features = no-cursor,sudo,no-title
@@ -44,7 +44,7 @@
 
         scrollback-limit = 104857600
 
-        confirm-close-surface = false
+        confirm-close-surface = true
 
         copy-on-select = clipboard
         macos-option-as-alt = true
