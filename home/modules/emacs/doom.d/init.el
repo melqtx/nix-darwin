@@ -1,4 +1,3 @@
-;;; init.el -*- lexical-binding: t; -*-
 
 (doom! :input
 
@@ -58,7 +57,7 @@
        javascript
        markdown
        nix
-       (org +pretty +roam2)
+       (org +dragndrop +pandoc +pretty +roam)
        sh
        web
 

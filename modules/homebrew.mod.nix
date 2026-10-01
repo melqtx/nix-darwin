@@ -19,10 +19,6 @@
         cleanup = "none";
       };
 
-      taps = [
-        "abue-ammar/tinycast"
-      ];
-
       brews = [
         "mas"
         "ffmpeg"
@@ -63,7 +59,6 @@
         "orbstack"
 
         "prismlauncher"
-        "tinycast"
       ];
 
       # MAS 7 requires interactive root and, for newly acquired apps, Apple

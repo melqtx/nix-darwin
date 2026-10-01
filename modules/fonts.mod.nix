@@ -8,6 +8,7 @@
         pkgs.fira-code
         pkgs.nerd-fonts.fira-code
         pkgs.nerd-fonts.jetbrains-mono
+        pkgs.nerd-fonts.symbols-only
         pkgs.noto-fonts
         pkgs.noto-fonts-cjk-sans
         pkgs.noto-fonts-cjk-serif

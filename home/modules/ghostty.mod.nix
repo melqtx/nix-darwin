@@ -4,9 +4,7 @@
   flake.homeModules.ghostty =
     { lib, pkgs, ... }:
     let
-      inherit (lib.meta) getExe;
-
-      zellij = getExe pkgs.zellij;
+      zellij = lib.getExe pkgs.zellij;
     in
     {
       xdg.configFile."ghostty/config".text = /* conf */ ''
@@ -27,8 +25,6 @@
         macos-titlebar-style = transparent
         window-colorspace = display-p3
         window-width = 120
-        window-height = 1000
-        gtk-tabs-location = hidden
 
         window-padding-x = 8
         window-padding-y = 8
@@ -64,10 +60,12 @@
         keybind = global:ctrl+`=toggle_quick_terminal
         keybind = shift+enter=text:\x1b\r
 
+        # Zellij owns tabs and pane focus, not Ghostty's native bindings.
         keybind = super+t=unbind
         keybind = super+w=unbind
         keybind = super+h=unbind
         keybind = super+l=unbind
+        keybind = super+r=unbind
         keybind = super+shift+t=unbind
         keybind = super+shift+w=unbind
         keybind = super+shift+h=unbind

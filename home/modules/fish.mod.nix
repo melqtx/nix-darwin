@@ -26,6 +26,7 @@
       fish = getExe pkgs.fish;
       fnm = getExe pkgs.fnm;
       fzf = getExe pkgs.fzf;
+      git = getExe pkgs.git;
       helix = getExe pkgs.helix;
       jj = getExe pkgs.jujutsu;
       neovim = getExe pkgs.neovim;
@@ -41,8 +42,8 @@
     in
     {
       home.sessionVariables = {
-        EDITOR = helix;
-        VISUAL = helix;
+        EDITOR = "zed --wait";
+        VISUAL = "zed --wait";
         NH_FLAKE = "${config.home.homeDirectory}/dots";
       };
 
@@ -66,9 +67,11 @@
         interactiveShellInit = /* fish */ ''
           ${starship} init fish | source
           ${zoxide} init fish | source
-          ${atuin} init fish | source
           ${direnv} hook fish | source
+          # Preserve fzf's file/directory bindings; Atuin owns history search.
+          set -gx FZF_CTRL_R_COMMAND ""
           ${fzf} --fish | source
+          ${atuin} init fish --disable-ai | source
           ${fnm} env --use-on-cd | source
           ${carapace} _carapace fish | source
         '';
@@ -126,6 +129,35 @@
             mc $argv[1]; and ${jj} git init
           '';
 
+          # Ghostty attaches to main. This helper opens a separate project
+          # session only from a plain shell; never nest a server in a pane.
+          zj = /* fish */ ''
+            if set -q ZELLIJ
+              echo "Already inside Zellij; detach before selecting another session." >&2
+              return 1
+            end
+
+            set -l old_pwd $PWD
+            set -l root $PWD
+            set -l git_root (${git} -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
+            if test $status -eq 0
+              set root $git_root
+            end
+
+            set -l session
+            if test (count $argv) -gt 0
+              set session $argv[1]
+            else
+              set session "project-"(string escape --style=var -- "$root")
+            end
+
+            builtin cd "$root"; or return
+            ${zellij} attach --create "$session"
+            set -l zellij_status $status
+            builtin cd "$old_pwd"
+            return $zellij_status
+          '';
+
           realwhich = /* fish */ ''
             readlink -f (command --search $argv[1])
           '';
@@ -180,7 +212,7 @@
           v = helix;
           hx = helix;
 
-          # ghostty's xterm-ghostty terminfo is unknown to the emacs daemon
+          # Ghostty's xterm-ghostty terminfo is unknown to the Emacs daemon
           emacs = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           e = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
@@ -189,7 +221,6 @@
           # their first commit; Git flake snapshots omit untracked files.
           rebuild = "${nh} darwin switch path:${config.home.homeDirectory}/dots";
           dots = "cd ~/dots";
-          zj = zellij;
           inherit fish;
         };
       };

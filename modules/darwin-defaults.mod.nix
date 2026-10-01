@@ -21,18 +21,17 @@
         Defaults pwfeedback
       '';
 
-      # Right cmd becomes F18, which hammerspoon treats as the Hyper layer.
-      # Applies to all keyboards; the internal one has no right cmd, so it
-      # only affects the HHKB in practice.
-      system.keyboard = {
-        enableKeyMapping = true;
-        userKeyMapping = [
-          {
-            HIDKeyboardModifierMappingSrc = 30064771303; # 0x7000000E7 right cmd
-            HIDKeyboardModifierMappingDst = 30064771181; # 0x70000006D F18
-          }
-        ];
-      };
+      # Disabled after switching to the Sofle v2; preserve right cmd instead
+      # of remapping it to F18 for Hammerspoon's Hyper layer.
+      # system.keyboard = {
+      #   enableKeyMapping = true;
+      #   userKeyMapping = [
+      #     {
+      #       HIDKeyboardModifierMappingSrc = 30064771303; # 0x7000000E7 right cmd
+      #       HIDKeyboardModifierMappingDst = 30064771181; # 0x70000006D F18
+      #     }
+      #   ];
+      # };
 
       system.defaults = {
         dock = {
@@ -109,55 +108,6 @@
             DSDontWriteUSBStores = true;
           };
 
-          # Keep Mission Control's native Ctrl+1..4 shortcuts declarative.
-          # These are the symbolic hotkey IDs for switching to Spaces 1-4.
-          "com.apple.symbolichotkeys".AppleSymbolicHotKeys = {
-            "118" = {
-              enabled = true;
-              value = {
-                parameters = [
-                  65535
-                  18
-                  262144
-                ];
-                type = "standard";
-              };
-            };
-            "119" = {
-              enabled = true;
-              value = {
-                parameters = [
-                  65535
-                  19
-                  262144
-                ];
-                type = "standard";
-              };
-            };
-            "120" = {
-              enabled = true;
-              value = {
-                parameters = [
-                  65535
-                  20
-                  262144
-                ];
-                type = "standard";
-              };
-            };
-            "121" = {
-              enabled = true;
-              value = {
-                parameters = [
-                  65535
-                  21
-                  262144
-                ];
-                type = "standard";
-              };
-            };
-          };
-
           "com.apple.finder" = {
             DisableAllAnimations = true;
             WarnOnEmptyTrash = false;
@@ -195,20 +145,45 @@
         SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
       };
 
-      # screencapture silently falls back to the Desktop when its target does
-      # not exist, so create it before defaults are applied.
+      # Create the screenshot target and merge only the symbolic shortcuts we
+      # own. A system.defaults dictionary assignment replaces every unrelated
+      # macOS shortcut, while defaults -dict-add preserves the existing map.
       system.activationScripts.postActivation.text = mkAfter ''
         /usr/bin/install -d -o ${primaryUser} -g staff ${escapeShellArg config.system.defaults.screencapture.location}
         /usr/bin/chflags nohidden ${escapeShellArg userHome}/Library
 
-        # Homebrew can replace app bundles during activation; refresh
-        # LaunchServices so repaired Discord/Vesktop bundles are discoverable.
-        lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
-        for app in /Applications/Discord.app /Applications/Vesktop.app; do
-          if [ -d "$app" ]; then
-            "$lsregister" -f "$app"
+        primary_uid=$(/usr/bin/id -u ${escapeShellArg primaryUser})
+        run_as_primary_user() {
+          /bin/launchctl asuser "$primary_uid" /usr/bin/sudo -u ${escapeShellArg primaryUser} "$@"
+        }
+
+        hotkeys_before="$(run_as_primary_user /usr/bin/defaults read com.apple.symbolichotkeys AppleSymbolicHotKeys 2>/dev/null || true)"
+
+        # Raycast owns the launcher shortcut. Disable both Spotlight actions
+        # on every rebuild without replacing other symbolic hotkeys.
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 64 '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>' \
+                    65 '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>1572864</integer></array><key>type</key><string>standard</string></dict></dict>'
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 118 '{ enabled = true; value = { parameters = (65535, 18, 262144); type = standard; }; }'
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 119 '{ enabled = true; value = { parameters = (65535, 19, 262144); type = standard; }; }'
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 120 '{ enabled = true; value = { parameters = (65535, 20, 262144); type = standard; }; }'
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 121 '{ enabled = true; value = { parameters = (65535, 21, 262144); type = standard; }; }'
+        run_as_primary_user /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys \
+          -dict-add 122 '{ enabled = true; value = { parameters = (65535, 23, 262144); type = standard; }; }'
+
+        hotkeys_after="$(run_as_primary_user /usr/bin/defaults read com.apple.symbolichotkeys AppleSymbolicHotKeys 2>/dev/null || true)"
+        if [ "$hotkeys_before" != "$hotkeys_after" ]; then
+          # Reload shortcuts in the logged-in user's session, not just Dock.
+          activate_settings=/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings
+          if [ -x "$activate_settings" ]; then
+            run_as_primary_user "$activate_settings" -u || echo "Shortcut reload failed; log out and back in to apply preferences." >&2
           fi
-        done
+          run_as_primary_user /usr/bin/killall Dock 2>/dev/null || true
+        fi
       '';
     };
 }

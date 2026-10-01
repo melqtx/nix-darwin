@@ -48,6 +48,11 @@
         }
 
         keybinds {
+          normal {
+            // History and file search belong to Atuin and fzf in the shell.
+            unbind "Ctrl r" "Ctrl t";
+          }
+
           shared_except "locked" {
             bind "Ctrl h" { MoveFocus "Left"; }
             bind "Ctrl j" { MoveFocus "Down"; }

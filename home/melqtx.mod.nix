@@ -4,11 +4,13 @@
   flake.homeModules.melqtx = {
     imports = [
       config.flake.homeModules.fish
+      config.flake.homeModules.atuin
       config.flake.homeModules.starship
       config.flake.homeModules.tooling
       config.flake.homeModules.ghostty
       config.flake.homeModules.zellij
       config.flake.homeModules.helix
+      config.flake.homeModules.zed
       config.flake.homeModules.version-control
       config.flake.homeModules.claude-code
       config.flake.homeModules.pi

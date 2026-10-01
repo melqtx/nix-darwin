@@ -18,23 +18,33 @@
         settings=${lib.escapeShellArg settingsFile}
 
         if [[ -v DRY_RUN ]]; then
-          if [ -f "$settings" ]; then
-            echo "Would disable Vesktop's self-updater in $settings"
-          fi
-        elif [ -f "$settings" ]; then
+          echo "Would disable Vesktop's self-updater in $settings"
+        else
+          /bin/mkdir -p "$(/usr/bin/dirname "$settings")"
           tmp=$(/usr/bin/mktemp "$settings.home-manager.XXXXXX")
+          source=/dev/null
+          if [ -f "$settings" ]; then
+            source="$settings"
+          fi
 
-          if ! ${lib.getExe pkgs.jq} \
-            '.autoUpdate = false | .autoUpdateNotification = false' \
-            "$settings" > "$tmp"; then
+          # Slurp accepts an empty source on first installation, but reject
+          # malformed or non-object settings rather than discarding user data.
+          if ! ${lib.getExe pkgs.jq} --slurp '
+            (if length == 0 then {} elif length == 1 and (.[0] | type) == "object"
+             then .[0] else error("Expected one Vesktop settings object") end)
+            | .autoUpdate = false | .autoUpdateNotification = false
+          ' "$source" > "$tmp"; then
             /bin/rm -f "$tmp"
             exit 1
           fi
 
-          if /usr/bin/cmp -s "$tmp" "$settings"; then
+          if [ -f "$settings" ] && /usr/bin/cmp -s "$tmp" "$settings"; then
             /bin/rm -f "$tmp"
           else
-            mode=$(/usr/bin/stat -f '%Lp' "$settings")
+            mode=600
+            if [ -f "$settings" ]; then
+              mode=$(/usr/bin/stat -f '%Lp' "$settings")
+            fi
             /bin/chmod "$mode" "$tmp"
             /bin/mv -f "$tmp" "$settings"
           fi

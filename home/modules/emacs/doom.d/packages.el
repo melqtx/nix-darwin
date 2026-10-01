@@ -1,3 +1,1 @@
-;;; packages.el -*- lexical-binding: t; -*-
-
-(package! org-roam-ui)
+;; Org uses Doom's built-in packages only.

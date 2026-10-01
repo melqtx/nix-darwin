@@ -14,6 +14,7 @@
         pkgs.rust-analyzer
         pkgs.clippy
         pkgs.lldb
+        pkgs.rustlings
 
         pkgs.gofumpt
         pkgs.gopls

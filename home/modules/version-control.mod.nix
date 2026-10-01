@@ -12,7 +12,7 @@
           };
 
           init.defaultBranch = "main";
-          core.editor = "hx";
+          core.editor = "zed --wait";
 
           fetch = {
             prune = true;
@@ -84,6 +84,7 @@
 
         ui = {
           default-command = "status";
+          editor = "zed --wait";
           conflict-marker-style = "snapshot";
           diff-formatter = [
             "${pkgs.difftastic}/bin/difft"
@@ -153,14 +154,16 @@
 
       programs.gpg.enable = true;
 
-      # Signing remains opt-in until a concrete private key is declared.
-      services.gpg-agent = {
-        enable = true;
-        defaultCacheTtl = 3600;
-        enableFishIntegration = true;
-        maxCacheTtl = 7200;
-        pinentry.package = pkgs.pinentry_mac;
-      };
+      # Signing remains opt-in until a concrete private key is declared. Let
+      # GnuPG start its agent on demand: the supervised launchd service crash-
+      # loops on current macOS/GnuPG before any signing request is made.
+      home.file.".gnupg/gpg-agent.conf".text = ''
+        default-cache-ttl 3600
+        max-cache-ttl 7200
+        pinentry-program ${lib.getExe pkgs.pinentry_mac}
+      '';
+
+      services.gpg-agent.enable = false;
 
       xdg.configFile."jj/config.toml".source = jjConfig;
       xdg.configFile."watchman/watchman.json".source = watchmanConfig;

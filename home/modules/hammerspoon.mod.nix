@@ -11,6 +11,13 @@
     let
       statsPath = "${config.home.homeDirectory}/.local/state/input-stats.json";
       hammerspoonConfig = pkgs.writeText "hammerspoon-init.lua" /* lua */ ''
+        -- Keep the CLI message port available so Home Manager can reload a
+        -- changed configuration instead of leaving the old bindings active.
+        require("hs.ipc")
+
+        -- Input tracking and window-management shortcuts need Hammerspoon at login.
+        hs.autoLaunch(true)
+
         local statsPath = "${statsPath}"
         local flushEverySeconds = 5
 
@@ -172,15 +179,14 @@
           publishStats(false)
         end)
 
-        -- Hyper layer: right cmd is remapped to F18 at the HID level (see
-        -- darwin-defaults.mod.nix). Hold it for window-manager operations,
-        -- mirroring the ctrl/cmd hjkl scheme used in zellij.
+        -- Hyper layer disabled after switching to the Sofle v2. Keep the
+        -- modal bindings below available in case another trigger is added.
         local hyper = hs.hotkey.modal.new()
-        hs.hotkey.bind({}, "f18", function()
-          hyper:enter()
-        end, function()
-          hyper:exit()
-        end)
+        -- hs.hotkey.bind({}, "f18", function()
+        --   hyper:enter()
+        -- end, function()
+        --   hyper:exit()
+        -- end)
 
         local function focusWindow(direction)
           return function()
@@ -278,10 +284,33 @@
         configFile="$configDir/init.lua"
         stagingFile="$configDir/.init.lua.home-manager"
 
+        configChanged=0
         if [[ -L "$configFile" ]] || ! /usr/bin/cmp -s "${hammerspoonConfig}" "$configFile"; then
           $DRY_RUN_CMD /usr/bin/install -d -m 0755 "$configDir"
           $DRY_RUN_CMD /usr/bin/install -m 0644 "${hammerspoonConfig}" "$stagingFile"
           $DRY_RUN_CMD /bin/mv -f "$stagingFile" "$configFile"
+          configChanged=1
+        fi
+
+        # Never mutate live application state during a Home Manager dry run.
+        # On a real activation, reload with a timeout so a wedged IPC server
+        # cannot block the entire system switch. A fresh install is opened once
+        # so init.lua can establish Hammerspoon's login item.
+        if [[ "$configChanged" -eq 1 && -z "''${DRY_RUN_CMD:-}" ]]; then
+          hsCli=/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs
+          if /usr/bin/pgrep -q Hammerspoon; then
+            if [[ ! -x "$hsCli" ]] || ! ${lib.getExe' pkgs.coreutils "timeout"} 3 \
+              "$hsCli" -c 'hs.reload()' >/dev/null 2>&1; then
+              /usr/bin/killall Hammerspoon 2>/dev/null || true
+              for _ in {1..20}; do
+                /usr/bin/pgrep -q Hammerspoon || break
+                /bin/sleep 0.1
+              done
+              /usr/bin/open -gj -a Hammerspoon
+            fi
+          elif [ -d /Applications/Hammerspoon.app ]; then
+            /usr/bin/open -gj -a Hammerspoon
+          fi
         fi
       '';
     };

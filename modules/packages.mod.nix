@@ -16,23 +16,23 @@
 
       pi = pkgs.buildNpmPackage (finalAttrs: {
         pname = "pi-coding-agent";
-        version = "0.84.1";
+        version = "0.84.4";
 
         src = pkgs.fetchurl {
           url = "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-${finalAttrs.version}.tgz";
-          hash = "sha256-ppoYWWAX6RlV/Q/Wd75p+rW26gHVsGIHvO407hUivCA=";
+          hash = "sha256-W852bRnDzroY8/uq2RxEnJ+dc5gfnjQA7O+TIAbwaWg=";
         };
 
         # the published shrinkwrap lacks integrity for pi's own sibling
         # packages, and devDependencies are absent from it entirely
         postPatch = ''
           ${lib.getExe pkgs.jq} '
-            .packages["node_modules/@earendil-works/pi-agent-core"].integrity = "sha512-evyzXYWCLQGmcaBYHlmSku02r8qoN4SGI60GZABo6iV+H+nqX+P9ud8fEZ4GmRq9mUSREvvfX+w9dA9ThF9C6w==" |
-            .packages["node_modules/@earendil-works/pi-ai"].integrity = "sha512-wMsAdJMxuNri08vLqTyYVI201DQQezGhPSTkzYsHdw5dYX3rCNwEmSvpaAwhi7ELKI/2tE/CEgSWg/6iRxSgdQ==" |
-            .packages["node_modules/@earendil-works/pi-client"].integrity = "sha512-/V5hGHE4Zq+jG0GtwIB9PyBUOGd6gBLZ7lkQYFKchKnxYHeH3rmWC5xw4kpnZKKBuBuFTdLVbU9vEjlAGMMb2A==" |
-            .packages["node_modules/@earendil-works/pi-protocol"].integrity = "sha512-Ox1pciyeSPGEEUcxvR0/dJcrY7C6hrEGA8y71rOsvSIUlXN1Cbp/be/eoL71OGDBk5O97TeQPfWN6Ju/2Ehjww==" |
-            .packages["node_modules/@earendil-works/pi-telemetry"].integrity = "sha512-180/xGJtsq7IoR3p9EKWjRd0e9M4DkxInhlo9xyD7prDC7Qrhqq+nhvwrW0lFjPfXcEI2FSHmGCSyvSJE9GsaQ==" |
-            .packages["node_modules/@earendil-works/pi-tui"].integrity = "sha512-udeXFbgEhJ6JiB0uguwNVNkDy2FENfmtQwPcY+/iJ8GWeq18wkal1tKqa5YyeH0IqtX1vG0cGh8zfSYzyzVuLA=="
+            .packages["node_modules/@earendil-works/pi-agent-core"].integrity = "sha512-HyUnjaOXj6oN/6SNcr8A1J/ElRQA50FtIE0XUTSKAQVqmdlb9qdojOyUQwF/jULE5+yOEtGuVgi/N1RnBiNG+g==" |
+            .packages["node_modules/@earendil-works/pi-ai"].integrity = "sha512-AClAZxf5+c4RRu44NJPS6wyQy+Nmq+Mzyyrdvm4ZVMNuixelO02RZX4G4Aq1F145Yzp43wnM5S+hLlSI7ypfVw==" |
+            .packages["node_modules/@earendil-works/pi-client"].integrity = "sha512-q398WY/3ZQHTizk7IKxApzqFV0xt4yM9LkSkwyqeLK5Bj5RwRjOWxESt26z4LgNp4O+8hqhqFPf/8fj4H5rE4A==" |
+            .packages["node_modules/@earendil-works/pi-protocol"].integrity = "sha512-acyE9ozxkMiWiz/xyWpU0O9vwnYv0hyG889Vniv6Sg9c9zfsX+8MePnDNphBacY2Fvm1rxdsGmiVDSZl9yuDFA==" |
+            .packages["node_modules/@earendil-works/pi-telemetry"].integrity = "sha512-8e2CuxM+ht+hedQXTZmi5JVl6/xDK9RpSDL2+MbITevKYQhMZ/z6lJOTFgox3HQyGxO8mOZEtYGVeQNaD4OzqA==" |
+            .packages["node_modules/@earendil-works/pi-tui"].integrity = "sha512-nPUnwDkLtupPXnZQYrCwPFcuTydCDqTY6ZbFqhsL4S4kVq0AT418kPa/6uXwtaCD+MjBNBltb7ScTYX65yeE1w=="
           ' npm-shrinkwrap.json > package-lock.json
           cp package-lock.json npm-shrinkwrap.json
 
@@ -40,7 +40,7 @@
           mv package.json.tmp package.json
         '';
 
-        npmDepsHash = "sha256-FfwODI+m5Jts0PrjA9mFa+Mp9QT17/ejixg84RGXGe4=";
+        npmDepsHash = "sha256-qehCRHtAPu1TS6zDPA5UgJ1ScUuRX3CmZhRoIQd3HM0=";
 
         dontNpmBuild = true;
 
@@ -70,7 +70,6 @@
         pkgs.neovim
 
         pkgs.zoxide
-        pkgs.atuin
         pkgs.direnv
         pkgs.nix-direnv
         pkgs.fzf
