@@ -1,6 +1,16 @@
-{ ... }:
+{ self, ... }:
 
 {
+  flake.darwinModules.claude-code = { config, lib, ... }: {
+    imports = [
+      self.darwinModules.unfree
+      self.darwinModules.home-manager
+    ];
+    nixpkgs.allowedUnfreePackages = lib.lists.singleton "claude-code";
+    home-manager.users.${config.system.primaryUser}.imports =
+      lib.lists.singleton self.homeModules.claude-code;
+  };
+
   flake.homeModules.claude-code =
     { lib, pkgs, ... }:
     let
@@ -38,7 +48,8 @@
         "jj workspace list*"
         "jj workspace root*"
 
-        "git branch*"
+        "git branch --list *"
+        "git branch --show-current"
         "git diff*"
         "git log*"
         "git remote -v"
@@ -62,7 +73,6 @@
         "nix eval*"
         "nix flake metadata*"
         "nix flake show*"
-        "nix-instantiate --parse*"
       ];
 
       settings = (pkgs.formats.json { }).generate "claude-settings.json" {
@@ -91,6 +101,8 @@
       };
     in
     {
+      home.packages = singleton pkgs.claude-code;
+
       home.file.".claude/settings.json" = {
         force = true;
         source = settings;

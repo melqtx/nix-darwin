@@ -1,0 +1,92 @@
+{
+  "Comment.nvim": {
+    "url": "https://github.com/numToStr/Comment.nvim.git"
+  },
+  "LuaSnip": {
+    "url": "https://github.com/L3MON4D3/LuaSnip.git"
+  },
+  "cmp-buffer": {
+    "url": "https://github.com/hrsh7th/cmp-buffer.git"
+  },
+  "cmp-nvim-lsp": {
+    "url": "https://github.com/hrsh7th/cmp-nvim-lsp.git"
+  },
+  "cmp-nvim-lua": {
+    "url": "https://github.com/hrsh7th/cmp-nvim-lua.git"
+  },
+  "cmp-path": {
+    "url": "https://github.com/hrsh7th/cmp-path.git"
+  },
+  "cmp_luasnip": {
+    "url": "https://github.com/saadparwaiz1/cmp_luasnip.git"
+  },
+  "conform.nvim": {
+    "url": "https://github.com/stevearc/conform.nvim.git"
+  },
+  "friendly-snippets": {
+    "url": "https://github.com/rafamadriz/friendly-snippets.git"
+  },
+  "gitsigns.nvim": {
+    "url": "https://github.com/lewis6991/gitsigns.nvim.git"
+  },
+  "indent-blankline.nvim": {
+    "url": "https://github.com/lukas-reineke/indent-blankline.nvim.git"
+  },
+  "lazy.nvim": {
+    "url": "https://github.com/folke/lazy.nvim.git"
+  },
+  "mini.starter": {
+    "url": "https://github.com/echasnovski/mini.starter.git"
+  },
+  "nvim-autopairs": {
+    "url": "https://github.com/windwp/nvim-autopairs.git"
+  },
+  "nvim-cmp": {
+    "url": "https://github.com/hrsh7th/nvim-cmp.git"
+  },
+  "nvim-colorizer.lua": {
+    "url": "https://github.com/NvChad/nvim-colorizer.lua.git"
+  },
+  "nvim-tree.lua": {
+    "url": "https://github.com/nvim-tree/nvim-tree.lua.git"
+  },
+  "nvim-treesitter": {
+    "url": "https://github.com/nvim-treesitter/nvim-treesitter.git"
+  },
+  "nvim-ts-autotag": {
+    "url": "https://github.com/windwp/nvim-ts-autotag.git"
+  },
+  "nvim-web-devicons": {
+    "url": "https://github.com/nvim-tree/nvim-web-devicons.git"
+  },
+  "plenary.nvim": {
+    "url": "https://github.com/nvim-lua/plenary.nvim.git"
+  },
+  "prism": {
+    "url": "https://github.com/chadcat7/prism.git"
+  },
+  "telescope-ui-select.nvim": {
+    "url": "https://github.com/nvim-telescope/telescope-ui-select.nvim.git"
+  },
+  "telescope.nvim": {
+    "url": "https://github.com/nvim-telescope/telescope.nvim.git"
+  },
+  "todo-comments.nvim": {
+    "url": "https://github.com/folke/todo-comments.nvim.git"
+  },
+  "toggleterm.nvim": {
+    "url": "https://github.com/akinsho/toggleterm.nvim.git"
+  },
+  "vim-astro": {
+    "url": "https://github.com/wuelnerdotexe/vim-astro.git"
+  },
+  "vim-nix": {
+    "url": "https://github.com/LnL7/vim-nix.git"
+  },
+  "vim-prisma": {
+    "url": "https://github.com/prisma/vim-prisma.git"
+  },
+  "yuck.vim": {
+    "url": "https://github.com/elkowar/yuck.vim.git"
+  }
+}

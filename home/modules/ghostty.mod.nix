@@ -1,79 +1,87 @@
-{ ... }:
+{ config, self, ... }:
 
+let
+  inherit (config) theme;
+in
 {
-  flake.homeModules.ghostty =
-    { lib, pkgs, ... }:
-    let
-      zellij = lib.getExe pkgs.zellij;
-    in
-    {
-      xdg.configFile."ghostty/config".text = /* conf */ ''
-        # The plain fira-code package registers only "Light" faces on macOS
-        # (no true Regular/Bold), which renders everything semi-bold. The
-        # nerd-fonts build ships a proper face set.
-        font-family = FiraCode Nerd Font Mono
-        font-size = 15
+  flake.darwinModules.ghostty = { config, lib, ... }: {
+    imports = [
+      self.darwinModules.homebrew
+      self.darwinModules.home-manager
+    ];
+    homebrew.casks = lib.lists.singleton "ghostty";
+    home-manager.users.${config.system.primaryUser}.imports =
+      lib.lists.singleton self.homeModules.ghostty;
+  };
 
-        theme = Vesper
+  flake.homeModules.ghostty = { lib, pkgs, ... }: {
+    programs.fish.interactiveShellInit = /* fish */ ''
+      if not set --query ZELLIJ
+        if test -r "$GHOSTTY_RESOURCES_DIR/shell-integration/fish/vendor_conf.d/ghostty-shell-integration.fish"
+          source "$GHOSTTY_RESOURCES_DIR/shell-integration/fish/vendor_conf.d/ghostty-shell-integration.fish"
+        end
+      end
+    '';
 
-        command = direct:${zellij} attach --create main
-
-        shell-integration = detect
-        shell-integration-features = no-cursor,sudo,no-title
-
-        fullscreen = false
-        macos-titlebar-style = transparent
-        window-colorspace = display-p3
-        window-width = 120
-
-        window-padding-x = 8
-        window-padding-y = 8
-
-        background-opacity = 1
-        background-blur-radius = 40
-        unfocused-split-opacity = 0.50
-
-        cursor-style = block
-        cursor-style-blink = false
-        cursor-color = #ffc799
-        cursor-text = #101010
-
-        scrollback-limit = 104857600
-
-        confirm-close-surface = true
-
-        copy-on-select = clipboard
-        macos-option-as-alt = true
-
-        window-save-state = never
-        window-inherit-working-directory = true
-
-        mouse-hide-while-typing = true
-
-        quick-terminal-position = center
-        quick-terminal-screen = mouse
-        quick-terminal-size = 100%,100%
-        quick-terminal-animation-duration = 0
-        quick-terminal-autohide = false
-        quick-terminal-keyboard-interactivity = exclusive
-
-        keybind = global:ctrl+`=toggle_quick_terminal
-        keybind = shift+enter=text:\x1b\r
-
-        # Zellij owns tabs and pane focus, not Ghostty's native bindings.
-        keybind = super+t=unbind
-        keybind = super+w=unbind
-        keybind = super+h=unbind
-        keybind = super+l=unbind
-        keybind = super+r=unbind
-        keybind = super+shift+t=unbind
-        keybind = super+shift+w=unbind
-        keybind = super+shift+h=unbind
-        keybind = super+shift+l=unbind
-        keybind = ctrl+h=unbind
-        keybind = ctrl+j=unbind
-        keybind = ctrl+k=unbind
-        keybind = ctrl+l=unbind
-      '';
+    programs.ghostty = {
+      enable = true;
+      package = null;
+      enableFishIntegration = false;
+      settings = {
+        font-family = theme.terminalFont;
+        font-size = theme.fontSize;
+        # Keep Vesper's distinct normal and bright ANSI colors.
+        theme = "Vesper";
+        background = theme.palette.terminalBackground;
+        foreground = theme.palette.terminalForeground;
+        selection-background = theme.palette.terminalBorder;
+        selection-foreground = theme.palette.terminalBackground;
+        command = "direct:${lib.meta.getExe pkgs.zellij} attach --create main";
+        shell-integration = "detect";
+        shell-integration-features = "no-cursor,sudo,no-title";
+        fullscreen = false;
+        macos-titlebar-style = "hidden";
+        window-colorspace = "display-p3";
+        window-width = 120;
+        window-padding-x = 8;
+        window-padding-y = 8;
+        background-opacity = 1;
+        unfocused-split-opacity = 0.50;
+        cursor-style = "block";
+        cursor-style-blink = false;
+        cursor-color = theme.palette.terminalAccent;
+        cursor-text = theme.palette.terminalBackground;
+        scrollback-limit = 104857600;
+        confirm-close-surface = true;
+        copy-on-select = "clipboard";
+        macos-option-as-alt = true;
+        window-save-state = "never";
+        window-inherit-working-directory = true;
+        mouse-hide-while-typing = true;
+        quick-terminal-position = "center";
+        quick-terminal-screen = "mouse";
+        quick-terminal-size = "100%,100%";
+        quick-terminal-animation-duration = 0;
+        quick-terminal-autohide = false;
+        quick-terminal-keyboard-interactivity = "exclusive";
+        keybind = [
+          "global:ctrl+`=toggle_quick_terminal"
+          "shift+enter=text:\\x1b\\r"
+          "super+t=unbind"
+          "super+w=unbind"
+          "super+h=unbind"
+          "super+l=unbind"
+          "super+r=unbind"
+          "super+shift+t=unbind"
+          "super+shift+w=unbind"
+          "super+shift+h=unbind"
+          "super+shift+l=unbind"
+          "ctrl+h=unbind"
+          "ctrl+j=unbind"
+          "ctrl+k=unbind"
+          "ctrl+l=unbind"
+        ];
+      };
     };
+  };
 }

@@ -1,9 +1,22 @@
-{ ... }:
+{ config, self, ... }:
 
+let
+  inherit (config) theme;
+in
 {
+  flake.darwinModules.zed = { config, lib, ... }: {
+    imports = [
+      self.darwinModules.homebrew
+      self.darwinModules.home-manager
+    ];
+    homebrew.casks = lib.lists.singleton "zed";
+    home-manager.users.${config.system.primaryUser}.imports = lib.lists.singleton self.homeModules.zed;
+  };
+
   flake.homeModules.zed =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
+      inherit (lib.lists) singleton;
       json = pkgs.formats.json { };
 
       settings = json.generate "zed-settings.json" {
@@ -13,7 +26,7 @@
         agent_servers."codex-acp".type = "registry";
 
         ui_font_size = 16;
-        buffer_font_size = 15;
+        buffer_font_size = theme.fontSize;
         theme = {
           mode = "system";
           light = "Ayu Light";
@@ -47,7 +60,7 @@
         {
           label = "Rust: run";
           command = "cargo";
-          args = [ "run" ];
+          args = singleton "run";
           save = "all";
         }
         {

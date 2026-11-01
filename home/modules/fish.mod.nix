@@ -11,39 +11,23 @@
     let
       inherit (lib.meta) getExe getExe';
 
-      atuin = getExe pkgs.atuin;
-      bat = getExe pkgs.bat;
       bottom = getExe pkgs.bottom;
-      btop = getExe pkgs.btop;
-      carapace = getExe pkgs.carapace;
       clear = getExe' pkgs.ncurses "clear";
-      delta = getExe pkgs.delta;
-      direnv = getExe pkgs.direnv;
-      dust = getExe pkgs.dust;
       emacsclient = getExe' config.programs.doom-emacs.finalEmacsPackage "emacsclient";
       eza = getExe pkgs.eza;
-      fd = getExe pkgs.fd;
-      fish = getExe pkgs.fish;
+      fish = getExe config.programs.fish.package;
       fnm = getExe pkgs.fnm;
-      fzf = getExe pkgs.fzf;
       git = getExe pkgs.git;
       helix = getExe pkgs.helix;
       jj = getExe pkgs.jujutsu;
-      neovim = getExe pkgs.neovim;
-      nh = getExe pkgs.nh;
-      procs = getExe pkgs.procs;
-      ripgrep = getExe pkgs.ripgrep;
-      sd = getExe pkgs.sd;
-      starship = getExe pkgs.starship;
+      neovim = getExe config.programs.neovim.finalPackage;
       xh = getExe pkgs.xh;
-      yazi = getExe pkgs.yazi;
-      zellij = getExe pkgs.zellij;
-      zoxide = getExe pkgs.zoxide;
+      zoxide = getExe config.programs.zoxide.package;
     in
     {
       home.sessionVariables = {
-        EDITOR = "zed --wait";
-        VISUAL = "zed --wait";
+        EDITOR = helix;
+        VISUAL = config.home.sessionVariables.EDITOR;
         NH_FLAKE = "${config.home.homeDirectory}/dots";
       };
 
@@ -53,62 +37,30 @@
         shellInit = /* fish */ ''
           # --path keeps this out of the universal fish_user_paths variable so
           # the order is recomputed every shell; each line prepends, so later
-          # lines win. Keep Nix ahead of Homebrew to prevent tool shadowing.
+          # lines win. Keep Home Manager ahead of system Nix and Homebrew.
           fish_add_path --move --path /opt/homebrew/sbin
           fish_add_path --move --path /opt/homebrew/bin
           fish_add_path --move --path ~/.local/bin
           fish_add_path --move --path ~/go/bin
           fish_add_path --move --path ~/.cargo/bin
           fish_add_path --move --path /run/current-system/sw/bin
-
-          set --global --export GPG_TTY (tty)
+          fish_add_path --move --path ${config.home.profileDirectory}/bin
         '';
 
         interactiveShellInit = /* fish */ ''
-          ${starship} init fish | source
-          ${zoxide} init fish | source
-          ${direnv} hook fish | source
-          # Preserve fzf's file/directory bindings; Atuin owns history search.
-          set -gx FZF_CTRL_R_COMMAND ""
-          ${fzf} --fish | source
-          ${atuin} init fish --disable-ai | source
+          set --global --export GPG_TTY (tty)
           ${fnm} env --use-on-cd | source
-          ${carapace} _carapace fish | source
         '';
 
         functions = {
-          # elenapan's bin/colorpanes (GekkoP's "panes" art) in gruvbox,
-          # hardcoded so it doesn't depend on the terminal palette
-          fish_greeting = /* fish */ ''
-            set -l body cc241d 98971a d79921 458588 b16286 689d6a d65d0e
-            set -l edge fb4934 b8bb26 fabd2f 83a598 d3869b 8ec07c fe8019
-
-            echo
-            for row in 1 2 3
-                echo -n ' '
-                for i in (seq 7)
-                    set_color $body[$i]
-                    echo -n '███'
-                    set_color $edge[$i]
-                    test $row -eq 1; and echo -n '▄'; or echo -n '█'
-                    echo -n '  '
-                end
-                set_color normal
-                echo
-            end
-            echo -n ' '
-            for i in (seq 7)
-                set_color $edge[$i]
-                echo -n ' ▀▀▀  '
-            end
-            set_color normal
-            echo
-            echo
-          '';
+          fish_greeting = "";
 
           battle = /* fish */ ''
-            builtin cd ${config.home.homeDirectory}/code
-            ${zellij} --layout battlestation
+            if not set --query REX_SESSION
+              echo "Open a Rex terminal first, then run battle." >&2
+              return 1
+            end
+            rex do battle cwd=${config.home.homeDirectory}/Documents/code
           '';
 
           battlestation = /* fish */ ''
@@ -129,33 +81,25 @@
             mc $argv[1]; and ${jj} git init
           '';
 
-          # Ghostty attaches to main. This helper opens a separate project
-          # session only from a plain shell; never nest a server in a pane.
-          zj = /* fish */ ''
-            if set -q ZELLIJ
-              echo "Already inside Zellij; detach before selecting another session." >&2
-              return 1
+          # Create a native Rex project session without nesting a multiplexer.
+          rx = /* fish */ ''
+            set --local root $PWD
+            set --local project_root (${jj} --ignore-working-copy root 2>/dev/null)
+            if test -z "$project_root"
+              set project_root (${git} -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
+            end
+            if test -n "$project_root"
+              set root $project_root
             end
 
-            set -l old_pwd $PWD
-            set -l root $PWD
-            set -l git_root (${git} -C "$PWD" rev-parse --show-toplevel 2>/dev/null)
-            if test $status -eq 0
-              set root $git_root
-            end
-
-            set -l session
+            set --local session
             if test (count $argv) -gt 0
               set session $argv[1]
             else
               set session "project-"(string escape --style=var -- "$root")
             end
 
-            builtin cd "$root"; or return
-            ${zellij} attach --create "$session"
-            set -l zellij_status $status
-            builtin cd "$old_pwd"
-            return $zellij_status
+            rex new "$session" --cwd "$root"
           '';
 
           realwhich = /* fish */ ''
@@ -165,24 +109,16 @@
 
         shellAliases = {
           zi = "${zoxide} query --interactive";
-          yy = yazi;
 
           # mtr-packet needs raw sockets; no setuid wrappers on nix-darwin
-          mtr = "sudo mtr";
+          mtr = "sudo ${getExe pkgs.mtr}";
 
           # nixpkgs peaclock links GNU libstdc++, which only knows the C
           # locale on darwin and aborts on en_IN.UTF-8
-          peaclock = "env LC_ALL=C peaclock";
+          peaclock = "env LC_ALL=C ${getExe pkgs.peaclock}";
 
-          js = "${jj} status";
           ja = "${jj} file track";
           ga = "${jj} file track";
-          jc = "${jj} commit";
-          jd = "${jj} diff";
-          jl = "${jj} log";
-          jn = "${jj} new";
-          jsh = "${jj} show";
-          ju = "${jj} undo";
 
           lg = "${jj} log";
           log = "${config.home.homeDirectory}/Documents/code/github/1337/bin/log";
@@ -194,16 +130,9 @@
           lt = "${eza} --no-quotes --all --tree --icons --group-directories-first";
           lr = "${eza} --no-quotes --recurse --icons --group-directories-first";
 
-          cat = bat;
-          grep = ripgrep;
-          find = fd;
-          du = dust;
-          ps = procs;
-          top = btop;
+          top = bottom;
           btm = bottom;
           http = xh;
-          diff = delta;
-          sed = sd;
 
           cls = clear;
           vim = neovim;
@@ -212,15 +141,12 @@
           v = helix;
           hx = helix;
 
-          # Ghostty's xterm-ghostty terminfo is unknown to the Emacs daemon
+          # Keep terminal Emacs compatible with the daemon's terminfo.
           emacs = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           e = "TERM=xterm-256color ${emacsclient} --tty --alternate-editor=''";
           eg = "${emacsclient} --create-frame --no-wait --alternate-editor=''";
           tree = "${eza} --no-quotes --tree";
-          # Use an explicit path flake so newly created modules work before
-          # their first commit; Git flake snapshots omit untracked files.
-          rebuild = "${nh} darwin switch path:${config.home.homeDirectory}/dots";
-          dots = "cd ~/dots";
+          dots = "cd ${config.home.sessionVariables.NH_FLAKE}";
           inherit fish;
         };
       };

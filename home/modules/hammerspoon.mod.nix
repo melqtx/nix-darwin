@@ -1,6 +1,16 @@
-{ ... }:
+{ self, ... }:
 
 {
+  flake.darwinModules.hammerspoon = { config, lib, ... }: {
+    imports = [
+      self.darwinModules.homebrew
+      self.darwinModules.home-manager
+    ];
+    homebrew.casks = lib.lists.singleton "hammerspoon";
+    home-manager.users.${config.system.primaryUser}.imports =
+      lib.lists.singleton self.homeModules.hammerspoon;
+  };
+
   flake.homeModules.hammerspoon =
     {
       config,
@@ -9,6 +19,11 @@
       ...
     }:
     let
+      inherit (lib.hm.dag) entryAfter;
+      inherit (lib.lists) singleton;
+      inherit (lib.meta) getExe';
+      inherit (lib.strings) escapeShellArg toJSON;
+
       statsPath = "${config.home.homeDirectory}/.local/state/input-stats.json";
       hammerspoonConfig = pkgs.writeText "hammerspoon-init.lua" /* lua */ ''
         -- Keep the CLI message port available so Home Manager can reload a
@@ -18,7 +33,7 @@
         -- Input tracking and window-management shortcuts need Hammerspoon at login.
         hs.autoLaunch(true)
 
-        local statsPath = "${statsPath}"
+        local statsPath = ${toJSON statsPath}
         local flushEverySeconds = 5
 
         -- BSD mkdir has no --parents longform, only -p
@@ -58,7 +73,7 @@
 
         local stats = defaultStats()
         if hs.fs.attributes(statsPath) then
-          stats = hs.json.read(statsPath) or stats
+          stats = assert(hs.json.read(statsPath), "Cannot read input stats; leaving existing data untouched")
         end
         stats.totals = stats.totals or defaultStats().totals
 
@@ -151,7 +166,7 @@
         -- publish stats to melqtx.com: cmd+alt+ctrl+S on demand, plus a
         -- daily auto-publish. Scheduled runs stay silent unless something
         -- actually happened (push or failure).
-        local publishStatsScript = "/Users/melqtx/Documents/code/github/1337/bin/update-input-stats"
+        local publishStatsScript = ${toJSON "${config.home.homeDirectory}/Documents/code/github/1337/bin/update-input-stats"}
         local function publishStats(interactive)
           flush()
           if interactive then
@@ -181,6 +196,16 @@
 
         -- Hyper layer disabled after switching to the Sofle v2. Keep the
         -- modal bindings below available in case another trigger is added.
+        -- Keep the old global terminal shortcut with Rex's native window.
+        hs.hotkey.bind({ "ctrl" }, "`", function()
+          local rex = hs.application.get("com.superlogical.rex")
+          if rex and rex:isFrontmost() then
+            rex:hide()
+          else
+            hs.application.launchOrFocusByBundleID("com.superlogical.rex")
+          end
+        end)
+
         local hyper = hs.hotkey.modal.new()
         -- hs.hotkey.bind({}, "f18", function()
         --   hyper:enter()
@@ -203,7 +228,7 @@
         hyper:bind({}, "l", focusWindow("East"))
 
         -- Modified Hyper chords are deliberately separate from the bare
-        -- hjkl focus bindings and from zellij/ghostty's Ctrl and Super keys.
+        -- hjkl focus bindings and from Rex's Ctrl and Super keys.
         local function withFocusedWindow(action)
           return function()
             local win = hs.window.focusedWindow()
@@ -279,37 +304,37 @@
       # Hammerspoon starts as a login item and may launch before the separate
       # Nix store volume is ready. Keep init.lua on the home volume instead of
       # exposing the usual Home Manager symlink into /nix/store.
-      home.activation.installHammerspoonConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-        configDir="${config.home.homeDirectory}/.hammerspoon"
+      home.activation.installHammerspoonConfig = entryAfter (singleton "linkGeneration") /* bash */ ''
+        configDir=${escapeShellArg "${config.home.homeDirectory}/.hammerspoon"}
         configFile="$configDir/init.lua"
-        stagingFile="$configDir/.init.lua.home-manager"
 
-        configChanged=0
         if [[ -L "$configFile" ]] || ! /usr/bin/cmp -s "${hammerspoonConfig}" "$configFile"; then
-          $DRY_RUN_CMD /usr/bin/install -d -m 0755 "$configDir"
-          $DRY_RUN_CMD /usr/bin/install -m 0644 "${hammerspoonConfig}" "$stagingFile"
-          $DRY_RUN_CMD /bin/mv -f "$stagingFile" "$configFile"
-          configChanged=1
-        fi
+          if [[ -v DRY_RUN ]]; then
+            echo "Would install and reload Hammerspoon configuration at $configFile"
+          else
+            (
+              /usr/bin/install -d -m 0755 "$configDir"
+              stagingFile=$(/usr/bin/mktemp "$configDir/.init.lua.home-manager.XXXXXX")
+              trap '/bin/rm -f "$stagingFile"' EXIT
+              /usr/bin/install -m 0644 "${hammerspoonConfig}" "$stagingFile"
+              /bin/mv -f "$stagingFile" "$configFile"
+            )
 
-        # Never mutate live application state during a Home Manager dry run.
-        # On a real activation, reload with a timeout so a wedged IPC server
-        # cannot block the entire system switch. A fresh install is opened once
-        # so init.lua can establish Hammerspoon's login item.
-        if [[ "$configChanged" -eq 1 && -z "''${DRY_RUN_CMD:-}" ]]; then
-          hsCli=/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs
-          if /usr/bin/pgrep -q Hammerspoon; then
-            if [[ ! -x "$hsCli" ]] || ! ${lib.getExe' pkgs.coreutils "timeout"} 3 \
-              "$hsCli" -c 'hs.reload()' >/dev/null 2>&1; then
-              /usr/bin/killall Hammerspoon 2>/dev/null || true
-              for _ in {1..20}; do
-                /usr/bin/pgrep -q Hammerspoon || break
-                /bin/sleep 0.1
-              done
+            # Bound IPC reload time so an unresponsive app cannot block a switch.
+            hsCli=/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs
+            if /usr/bin/pgrep -q Hammerspoon; then
+              if [[ ! -x "$hsCli" ]] || ! ${getExe' pkgs.coreutils "timeout"} 3 \
+                "$hsCli" -c 'hs.reload()' >/dev/null 2>&1; then
+                /usr/bin/killall Hammerspoon 2>/dev/null || true
+                for _ in {1..20}; do
+                  /usr/bin/pgrep -q Hammerspoon || break
+                  /bin/sleep 0.1
+                done
+                /usr/bin/open -gj -a Hammerspoon
+              fi
+            elif [ -d /Applications/Hammerspoon.app ]; then
               /usr/bin/open -gj -a Hammerspoon
             fi
-          elif [ -d /Applications/Hammerspoon.app ]; then
-            /usr/bin/open -gj -a Hammerspoon
           fi
         fi
       '';

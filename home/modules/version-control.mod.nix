@@ -1,36 +1,58 @@
-{ ... }:
+{ config, ... }:
 
+let
+  inherit (config) profile;
+in
 {
   flake.homeModules.version-control =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
-      gitConfig = pkgs.writeText "gitconfig" (
-        lib.generators.toGitINI {
-          user = {
-            name = "melqtx";
-            email = "melqtx@proton.me";
-          };
+      inherit (lib.lists) singleton;
+      inherit (lib.meta) getExe;
+      jj = getExe pkgs.jujutsu;
+      shellAliases = {
+        j = getExe pkgs.jjui;
+        js = "${jj} status";
+        jd = "${jj} diff";
+        jl = "${jj} log";
+        jn = "${jj} new";
+        jc = "${jj} commit";
+        jcp = "${jj} checkpoint";
+        jb = "${jj} bookmark list";
+        jf = "${jj} git fetch";
+        jop = "${jj} ops";
+        jsh = "${jj} show";
+        ju = "${jj} undo";
+      };
 
-          init.defaultBranch = "main";
-          core.editor = "zed --wait";
+      user = {
+        inherit (profile) name email;
+      };
 
-          fetch = {
-            prune = true;
-            fsckObjects = true;
-          };
+      gitSettings = {
+        inherit user;
 
-          pull.rebase = false;
-          receive.fsckObjects = true;
-          transfer.fsckObjects = true;
-          credential.helper = "osxkeychain";
-        }
-      );
+        init.defaultBranch = "main";
+        core.editor = config.home.sessionVariables.EDITOR;
 
-      jjConfig = (pkgs.formats.toml { }).generate "jj-config.toml" {
-        user = {
-          name = "melqtx";
-          email = "melqtx@proton.me";
+        fetch = {
+          prune = true;
+          fsckObjects = true;
         };
+
+        pull.rebase = false;
+        receive.fsckObjects = true;
+        transfer.fsckObjects = true;
+        credential.helper = "osxkeychain";
+      };
+
+      jjSettings = {
+        inherit user;
 
         aliases = {
           ".." = [
@@ -45,20 +67,20 @@
             "file"
             "track"
           ];
-          c = [ "commit" ];
-          d = [ "diff" ];
-          e = [ "edit" ];
+          c = singleton "commit";
+          d = singleton "diff";
+          e = singleton "edit";
           f = [
             "git"
             "fetch"
           ];
-          l = [ "log" ];
+          l = singleton "log";
           la = [
             "log"
             "--revisions"
             "::"
           ];
-          n = [ "new" ];
+          n = singleton "new";
           p = [
             "git"
             "push"
@@ -66,36 +88,58 @@
           resolve-ast = [
             "resolve"
             "--tool"
-            "${pkgs.mergiraf}/bin/mergiraf"
+            "mergiraf"
           ];
-          s = [ "status" ];
-          sh = [ "show" ];
-          sq = [ "squash" ];
+          s = singleton "status";
+          sh = singleton "show";
+          sq = singleton "squash";
           sqi = [
             "squash"
             "--interactive"
           ];
-          u = [ "undo" ];
+          u = singleton "undo";
+          checkpoint = singleton "commit";
+          review = [
+            "diff"
+            "--stat"
+          ];
+          stack = [
+            "log"
+            "--revisions"
+            "trunk()..@ | trunk()"
+          ];
+          ops = [
+            "op"
+            "log"
+            "--limit"
+            "12"
+          ];
+          rebase-trunk = [
+            "rebase"
+            "--destination"
+            "trunk()"
+          ];
+          push-preview = [
+            "git"
+            "push"
+            "--dry-run"
+          ];
         };
 
-        revsets.log = ''
+        git.colocate = true;
+
+        merge-tools.mergiraf.program = getExe pkgs.mergiraf;
+
+        revsets.log = /* jj-revset */ ''
           present(@) | present(trunk()) | ancestors(remote_bookmarks().. | @.., 8)
         '';
 
         ui = {
           default-command = "status";
-          editor = "zed --wait";
+          editor = config.home.sessionVariables.EDITOR;
           conflict-marker-style = "snapshot";
-          diff-formatter = [
-            "${pkgs.difftastic}/bin/difft"
-            "--color"
-            "always"
-            "$left"
-            "$right"
-          ];
           diff-editor = ":builtin";
           graph.style = "curved";
-          pager = "less -FRX";
         };
 
         fsmonitor = {
@@ -104,7 +148,7 @@
         };
 
         templates = {
-          draft_commit_description = ''
+          draft_commit_description = /* jj-template */ ''
             concat(
               coalesce(description, "\n"),
               surround(
@@ -116,56 +160,65 @@
             )
           '';
 
-          git_push_bookmark = ''"melqtx/change-" ++ change_id.short()'';
+          git_push_bookmark = ''"mel/change-" ++ change_id.short()'';
         };
 
         remotes."*" = {
-          auto-track-bookmarks = "melqtx/*";
+          auto-track-bookmarks = "mel/*";
           push-new-bookmarks = true;
         };
       };
 
-      watchmanConfig = (pkgs.formats.json { }).generate "watchman.json" {
-        ignore_dirs = [
-          ".direnv"
-          "node_modules"
-          "target"
-        ];
-      };
     in
     {
       home.packages = [
-        pkgs.jujutsu
         pkgs.jjui
         pkgs.lazyjj
         pkgs.lazygit
-        pkgs.delta
         pkgs.gh
         pkgs.mergiraf
         pkgs.watchman
       ];
 
-      # Git ignores the XDG config when ~/.gitconfig exists, so migrate and
-      # manage the pre-existing global file directly.
+      xdg.configFile."git/config".enable = false;
       home.file.".gitconfig" = {
         force = true;
-        source = gitConfig;
+        source = config.xdg.configFile."git/config".source;
       };
 
+      programs.git = {
+        enable = true;
+        settings = gitSettings;
+      };
+      programs.jujutsu = {
+        enable = true;
+        ediff = false;
+        settings = jjSettings;
+      };
+      programs.fish.shellAliases = shellAliases;
+      programs.nushell.shellAliases = shellAliases;
       programs.gpg.enable = true;
+      programs.delta = {
+        enable = true;
+        enableGitIntegration = true;
+        enableJujutsuIntegration = true;
+        options = {
+          dark = true;
+          navigate = true;
+          line-numbers = true;
+        };
+      };
 
       # Signing remains opt-in until a concrete private key is declared. Let
       # GnuPG start its agent on demand: the supervised launchd service crash-
       # loops on current macOS/GnuPG before any signing request is made.
-      home.file.".gnupg/gpg-agent.conf".text = ''
+      home.file.".gnupg/gpg-agent.conf".text = /* conf */ ''
         default-cache-ttl 3600
         max-cache-ttl 7200
-        pinentry-program ${lib.getExe pkgs.pinentry_mac}
+        pinentry-program ${getExe pkgs.pinentry_mac}
       '';
 
       services.gpg-agent.enable = false;
 
-      xdg.configFile."jj/config.toml".source = jjConfig;
-      xdg.configFile."watchman/watchman.json".source = watchmanConfig;
     };
 }

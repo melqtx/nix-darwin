@@ -6,7 +6,7 @@
     {
       programs.starship = {
         enable = true;
-        enableFishIntegration = false;
+        enableFishIntegration = true;
 
         settings = {
           format = "$directory$git_branch$nix_shell$python$line_break$character";
@@ -25,28 +25,6 @@
           git_branch = {
             format = "  [ $branch]($style)";
             style = "yellow";
-          };
-
-          git_status = {
-            format = "[[( [::](dimmed) $conflicted$untracked$modified$staged$renamed$deleted)](blue) ($ahead_behind$stashed)]($style)";
-            style = "cyan";
-            conflicted = " ";
-            untracked = "󰰨 ";
-            modified = "󰯲 ";
-            staged = "󰰢 ";
-            renamed = "󰰟 ";
-            deleted = "󰯵 ";
-            stashed = "≡";
-          };
-
-          git_state = {
-            format = "\\(\\) ";
-            style = "bright-black";
-          };
-
-          cmd_duration = {
-            format = "[(   󱎫  took $duration\\n)]($style)";
-            style = "dimmed";
           };
 
           python = {

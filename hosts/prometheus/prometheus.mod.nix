@@ -1,45 +1,46 @@
-{ config, inputs, ... }:
+{
+  config,
+  inputs,
+  ...
+}:
 
+let
+  inherit (config) profile;
+in
 {
   flake.darwinConfigurations.prometheus = inputs.nix-darwin.lib.darwinSystem {
     system = "aarch64-darwin";
 
     modules = [
-      inputs.home-manager.darwinModules.home-manager
-      inputs.nix-homebrew.darwinModules.nix-homebrew
+      config.flake.darwinModules.home-manager
+      config.flake.darwinModules.unfree
 
       config.flake.darwinModules.darwin-defaults
       config.flake.darwinModules.fonts
       config.flake.darwinModules.helium
+      config.flake.darwinModules.zen
       config.flake.darwinModules.homebrew
+      config.flake.darwinModules.obs
+      config.flake.darwinModules.rex
+      config.flake.darwinModules.zed
+      config.flake.darwinModules.hammerspoon
+      config.flake.darwinModules.vesktop
+      config.flake.darwinModules.claude-code
       config.flake.darwinModules.packages
 
-      (
-        { ... }:
-        {
-          nix.enable = false;
+      {
+        nix.enable = false;
 
-          programs.fish.enable = true;
+        programs.fish.enable = true;
 
-          users.users.melqtx = {
-            name = "melqtx";
-            home = "/Users/melqtx";
-          };
+        users.users.${profile.username} = {
+          name = profile.username;
+          home = profile.homeDirectory;
+        };
 
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-
-            sharedModules = [ inputs.nix-doom-emacs-unstraightened.homeModule ];
-            users.melqtx = config.flake.homeModules.melqtx;
-          };
-
-          system.primaryUser = "melqtx";
-          system.stateVersion = 6;
-        }
-      )
+        system.primaryUser = profile.username;
+        system.stateVersion = 6;
+      }
     ];
-
-    specialArgs = { inherit inputs; };
   };
 }
