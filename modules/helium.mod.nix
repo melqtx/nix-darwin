@@ -1,11 +1,16 @@
-{ ... }:
+{ self, ... }:
 
 {
   flake.darwinModules.helium =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (lib.attrsets) mapAttrsToList;
-      inherit (lib.meta) getExe;
+      inherit (lib.lists) singleton;
       inherit (lib.modules) mkAfter;
       inherit (lib.strings) concatLines toJSON;
 
@@ -36,9 +41,11 @@
       # platform-spoofing patch), and Google's endpoint answers "noupdate"
       # to any query without it. The proxy tolerates the stripped query and
       # serves the CWS crx through services.helium.imput.net/ext/proxy.
-      externalSpec = pkgs.writeText "helium-external-extension.json" (toJSON {
-        external_update_url = "https://services.helium.imput.net/ext";
-      });
+      externalSpec =
+        pkgs.writeText "helium-external-extension.json"
+        <| toJSON {
+          external_update_url = "https://services.helium.imput.net/ext";
+        };
 
       installExtensions = concatLines (
         mapAttrsToList (
@@ -48,21 +55,17 @@
       );
     in
     {
-      system.activationScripts.postActivation.text = mkAfter ''
-        # Drop the Helium-specific seed directory created by an older
-        # generation. Chromium never reads this location.
-        /bin/rm -rf "/Library/Application Support/net.imput.helium/External Extensions"
-        /usr/bin/rmdir "/Library/Application Support/net.imput.helium" 2>/dev/null || true
+      imports = [
+        self.darwinModules.homebrew
+        self.darwinModules.home-manager
+      ];
+      homebrew.casks = singleton "helium-browser";
+      home-manager.users.${config.system.primaryUser}.imports = singleton self.homeModules.helium;
 
-        # This directory is shared with Chrome and other management tools.
-        # Install only the extension IDs owned here; never clear it wholesale.
+      system.activationScripts.postActivation.text = mkAfter /* bash */ ''
+        # This directory is shared with Chrome; only install our own IDs.
         /bin/mkdir -p "${externalExtensionsDir}"
         ${installExtensions}
-
-        # helium: assert default browser as the console user (macOS shows a
-        # one-click confirmation dialog whenever the default actually changes)
-        consoleUser=$(/usr/bin/stat -f %Su /dev/console)
-        /usr/bin/sudo --set-home --user "$consoleUser" "${getExe pkgs.defaultbrowser}" helium || true
       '';
     };
 }

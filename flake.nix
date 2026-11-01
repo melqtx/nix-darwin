@@ -1,7 +1,7 @@
 {
   description = "prometheus darwin config";
 
-  nixConfig.experimental-features = [
+  nixConfig.extra-experimental-features = [
     "flakes"
     "nix-command"
     "pipe-operators"
@@ -26,7 +26,38 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # Upstream now pins Brew 7, so the older cask-DSL override is unnecessary.
+    nix-homebrew.inputs.brew-src.follows = "homebrew-brew";
+
+    # Match the newer formula DSL used by the pinned Homebrew taps.
+    homebrew-brew = {
+      url = "github:Homebrew/brew/7.0.11";
+      flake = false;
+    };
+
+    homebrew-core = {
+      url = "github:Homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:Homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-anomalyco = {
+      url = "github:anomalyco/homebrew-tap";
+      flake = false;
+    };
+    homebrew-crmne = {
+      url = "github:crmne/homebrew-tap";
+      flake = false;
+    };
+    homebrew-cmux = {
+      url = "github:manaflow-ai/homebrew-cmux";
+      flake = false;
+    };
+    homebrew-qmk = {
+      url = "github:qmk/homebrew-qmk";
+      flake = false;
+    };
   };
 
   outputs =
@@ -41,7 +72,7 @@
       {
         systems = singleton "aarch64-darwin";
 
-        imports = filter (hasSuffix ".mod.nix") (listFilesRecursive ./.);
+        imports = filter (hasSuffix ".mod.nix") <| listFilesRecursive ./.;
       }
     );
 }

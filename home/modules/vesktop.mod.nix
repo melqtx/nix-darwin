@@ -1,6 +1,16 @@
-{ ... }:
+{ self, ... }:
 
 {
+  flake.darwinModules.vesktop = { config, lib, ... }: {
+    imports = [
+      self.darwinModules.homebrew
+      self.darwinModules.home-manager
+    ];
+    homebrew.casks = lib.lists.singleton "vesktop";
+    home-manager.users.${config.system.primaryUser}.imports =
+      lib.lists.singleton self.homeModules.vesktop;
+  };
+
   flake.homeModules.vesktop =
     {
       config,
@@ -9,13 +19,16 @@
       ...
     }:
     let
-      settingsFile = "${config.home.homeDirectory}/Library/Application Support/vesktop/settings/settings.json";
+      inherit (lib.hm.dag) entryAfter;
+      inherit (lib.lists) singleton;
+      inherit (lib.meta) getExe;
+      inherit (lib.strings) escapeShellArg;
     in
     {
       # Homebrew owns the app bundle. Vesktop's self-updater can replace files
       # inside that bundle and leave macOS rejecting it as improperly signed.
-      home.activation.disableVesktopAutoUpdate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        settings=${lib.escapeShellArg settingsFile}
+      home.activation.disableVesktopAutoUpdate = entryAfter (singleton "writeBoundary") /* bash */ ''
+        settings=${escapeShellArg "${config.home.homeDirectory}/Library/Application Support/vesktop/settings/settings.json"}
 
         if [[ -v DRY_RUN ]]; then
           echo "Would disable Vesktop's self-updater in $settings"
@@ -29,7 +42,7 @@
 
           # Slurp accepts an empty source on first installation, but reject
           # malformed or non-object settings rather than discarding user data.
-          if ! ${lib.getExe pkgs.jq} --slurp '
+          if ! ${getExe pkgs.jq} --slurp '
             (if length == 0 then {} elif length == 1 and (.[0] | type) == "object"
              then .[0] else error("Expected one Vesktop settings object") end)
             | .autoUpdate = false | .autoUpdateNotification = false

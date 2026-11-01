@@ -1,9 +1,9 @@
 ;;; config.el -*- lexical-binding: t; -*-
 
-(setq user-full-name "melqtx"
-      user-mail-address "melqtx@proton.me")
+(setq user-full-name @userFullName@
+      user-mail-address @userEmail@)
 
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 15)
+(setq doom-font (font-spec :family @editorFont@ :size @fontSize@)
       doom-theme 'doom-one
       display-line-numbers-type 'relative
       shell-file-name (executable-find "bash"))
@@ -13,17 +13,17 @@
 
 (after! doom-themes
   (custom-set-faces!
-    '(default :background "#101010" :foreground "#ffffff")
-    '(solaire-default-face :background "#101010" :foreground "#ffffff")
-    '(fringe :background "#101010")
-    '(cursor :background "#ffc799")
-    '(region :background "#988049" :foreground "#ffffff")
-    '(hl-line :background "#181818")
-    '(line-number :foreground "#7e7e7e" :background "#101010")
-    '(line-number-current-line :foreground "#ffc799" :background "#101010")
-    '(vertical-border :foreground "#282828")
-    '(mode-line :background "#1c1c1c" :foreground "#ffffff")
-    '(mode-line-inactive :background "#101010" :foreground "#7e7e7e")))
+    '(default :background @background@ :foreground @foreground@)
+    '(solaire-default-face :background @background@ :foreground @foreground@)
+    '(fringe :background @background@)
+    '(cursor :background @accent@)
+    '(region :background @selection@ :foreground @foreground@)
+    '(hl-line :background @highlight@)
+    '(line-number :foreground @muted@ :background @background@)
+    '(line-number-current-line :foreground @accent@ :background @background@)
+    '(vertical-border :foreground @border@)
+    '(mode-line :background @modeline@ :foreground @foreground@)
+    '(mode-line-inactive :background @background@ :foreground @muted@)))
 
 (defconst melqtx/org-agenda-file-names '("todo.org" "inbox.org"))
 

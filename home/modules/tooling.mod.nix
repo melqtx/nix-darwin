@@ -5,6 +5,7 @@
     { lib, pkgs, ... }:
     let
       inherit (lib.meta) getExe;
+      inherit (lib.lists) singleton;
     in
     {
       home.packages = [
@@ -22,13 +23,12 @@
         LESS = "--quit-if-one-screen --quit-on-intr --ignore-case --incsearch --LONG-PROMPT --no-edit-warn --chop-long-lines --HILITE-UNREAD --tilde --RAW-CONTROL-CHARS";
         MANPAGER = "sh -c 'col -bx | ${getExe pkgs.bat} --language man --plain --color always'";
         MANROFFOPT = "-c";
-        RIPGREP_CONFIG_PATH = "$HOME/.config/ripgrep/config";
       };
 
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;
-        includes = [ "~/.orbstack/ssh/config" ];
+        includes = singleton "~/.orbstack/ssh/config";
 
         settings."*" = {
           AddKeysToAgent = "no";
@@ -47,9 +47,42 @@
       # man package whose caches need generating.
       programs.man.generateCaches = false;
 
-      xdg.configFile."ripgrep/config".text = ''
-        --line-number
-        --smart-case
-      '';
+      programs = {
+        broot = {
+          enable = true;
+          settings.modal = true;
+        };
+        yazi = {
+          enable = true;
+          shellWrapperName = "yy";
+        };
+        carapace.enable = true;
+        direnv = {
+          enable = true;
+          nix-direnv.enable = true;
+        };
+        fzf = {
+          enable = true;
+          defaultCommand = "${getExe pkgs.fd} --type f --hidden --exclude .git";
+          fileWidget.command = "${getExe pkgs.fd} --type f --hidden --exclude .git";
+          changeDirWidget.command = "${getExe pkgs.fd} --type d --hidden --exclude .git";
+          defaultOptions = [
+            "--height=40%"
+            "--layout=reverse"
+            "--border=rounded"
+          ];
+          # Atuin owns Ctrl+R; retain fzf's file/directory bindings.
+          historyWidget.fish.command = "";
+          historyWidget.nushell.command = "";
+        };
+        ripgrep = {
+          enable = true;
+          arguments = [
+            "--line-number"
+            "--smart-case"
+          ];
+        };
+        zoxide.enable = true;
+      };
     };
 }

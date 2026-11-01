@@ -16,22 +16,10 @@
         reattach = true;
       };
 
-      security.sudo.extraConfig = ''
+      security.sudo.extraConfig = /* sudoers */ ''
         Defaults lecture = never
         Defaults pwfeedback
       '';
-
-      # Disabled after switching to the Sofle v2; preserve right cmd instead
-      # of remapping it to F18 for Hammerspoon's Hyper layer.
-      # system.keyboard = {
-      #   enableKeyMapping = true;
-      #   userKeyMapping = [
-      #     {
-      #       HIDKeyboardModifierMappingSrc = 30064771303; # 0x7000000E7 right cmd
-      #       HIDKeyboardModifierMappingDst = 30064771181; # 0x70000006D F18
-      #     }
-      #   ];
-      # };
 
       system.defaults = {
         dock = {
@@ -113,10 +101,6 @@
             WarnOnEmptyTrash = false;
           };
 
-          "com.mitchellh.ghostty".NSUserKeyEquivalents = {
-            "Hide Ghostty" = "@~^$h";
-            "Hide Others" = "@~^$o";
-          };
         };
 
         screensaver = {
@@ -148,13 +132,13 @@
       # Create the screenshot target and merge only the symbolic shortcuts we
       # own. A system.defaults dictionary assignment replaces every unrelated
       # macOS shortcut, while defaults -dict-add preserves the existing map.
-      system.activationScripts.postActivation.text = mkAfter ''
+      system.activationScripts.postActivation.text = mkAfter /* bash */ ''
         /usr/bin/install -d -o ${primaryUser} -g staff ${escapeShellArg config.system.defaults.screencapture.location}
         /usr/bin/chflags nohidden ${escapeShellArg userHome}/Library
 
         primary_uid=$(/usr/bin/id -u ${escapeShellArg primaryUser})
         run_as_primary_user() {
-          /bin/launchctl asuser "$primary_uid" /usr/bin/sudo -u ${escapeShellArg primaryUser} "$@"
+          /bin/launchctl asuser "$primary_uid" /usr/bin/sudo --user ${escapeShellArg primaryUser} "$@"
         }
 
         hotkeys_before="$(run_as_primary_user /usr/bin/defaults read com.apple.symbolichotkeys AppleSymbolicHotKeys 2>/dev/null || true)"

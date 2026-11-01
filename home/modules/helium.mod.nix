@@ -9,7 +9,9 @@
       ...
     }:
     let
-      inherit (lib.strings) toJSON;
+      inherit (lib.hm.dag) entryAfter;
+      inherit (lib.lists) singleton;
+      inherit (lib.strings) escapeShellArg toJSON;
 
       preferences = {
         helium.completed_onboarding = true;
@@ -30,18 +32,21 @@
         # Toggle manually in helium://extensions.
       };
 
-      preferencesFile = pkgs.writeText "helium-default-preferences.json" (toJSON preferences);
+      preferencesFile = pkgs.writeText "helium-default-preferences.json" <| toJSON preferences;
     in
     {
       # Chromium rewrites Preferences constantly at runtime, so it can't be a
       # store symlink; seed it once and let the browser own it afterwards.
-      home.activation.seedHeliumPreferences = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        prefs="${config.home.homeDirectory}/Library/Application Support/net.imput.helium/Default/Preferences"
+      home.activation.seedHeliumPreferences = entryAfter (singleton "writeBoundary") /* bash */ ''
+        prefs=${escapeShellArg "${config.home.homeDirectory}/Library/Application Support/net.imput.helium/Default/Preferences"}
 
-        if [ ! -e "$prefs" ]; then
-          $DRY_RUN_CMD /bin/mkdir -p "$(/usr/bin/dirname "$prefs")"
-          $DRY_RUN_CMD /bin/cp "${preferencesFile}" "$prefs"
-          $DRY_RUN_CMD /bin/chmod 600 "$prefs"
+        if [[ ! -e "$prefs" && ! -L "$prefs" ]]; then
+          if [[ -v DRY_RUN ]]; then
+            echo "Would seed Helium preferences at $prefs"
+          else
+            /bin/mkdir -p "$(/usr/bin/dirname "$prefs")"
+            /usr/bin/install -m 600 "${preferencesFile}" "$prefs"
+          fi
         fi
       '';
     };
